@@ -1,0 +1,66 @@
+#!/bin/sh
+
+set -x
+
+inferred_upstream="$(git remote | grep ^upstream || git remote | grep ^origin || git remote | head -1)"
+inferred_origin="$(git remote | grep ^origin || git remote | grep ^upstream || git remote | head -1)"
+
+
+cmd=$1
+shift 1
+
+case cmd in
+
+    # Create a new HEAD suitable for a pull request.  Use
+    # upstream/HEAD, origin/HEAD, or (the first remote)/HEAD as
+    # the base.  If a argument is given, create a branch of this
+    # name, otherwise create a detached head here.
+    new)
+	git checkout $(test $1 && echo "-b" $1) ${inferred_upstream}/HEAD
+	;;
+
+    # Push a PR branch.  If one argument given, push to that
+    # branch on guessed remote (same logic as above).  This is
+    # suitable for the local detached heads workflow.  If two
+    # arguments given, the first is a remote and the second is
+    # branch name.  If no arguments given, use the current branch
+    # name as the remote branch name (only works if you have a
+    # local branch).
+    push)
+	git push $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}
+	;;
+
+    # Compare current working tree to upstream merge-base.  Uses
+    # same logic to find upstream merge base as "prnew"
+    di)
+	git diff $(git merge-base ${inferred_upstream}/HEAD HEAD)
+	;;
+
+    # Delete a branch (argument 1) both locally and remotely.
+    rm)
+	git branch | grep $1 && git branch -d $1
+	git branch -a | grep ${inferred_origin}/$1 && git push ${inferred_origin} :$1
+	;;
+
+    # Fetch PR refs to local.  Give one PR numbers, and they will
+    # be pulled as $remote/pr/$number.  (This should be modified
+    # to take multiple PR numbers)
+    fetch)
+	git fetch ${inferred_upstream} --refmap="+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/pull/$1/head
+	;;
+
+    # Fetch all PRs from a certain remote
+    fetchall)
+	git fetch upstream "+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*"
+	;;
+
+    # Delete everything fetched by prfetchall.  Note, this deletes
+    # these refs from *all* remotes, not just the default
+    # upstream.  It will delete anything matching '/pr/[0-9]+'
+    unfetchall)
+	git branch --remote -d `git branch --remote | grep -E '/pr/[0-9]+$'`
+	;;
+    *)
+	echo "Valid commands: new push di rm fetch fetchall unfetchall"
+	;;
+esac
