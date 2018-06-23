@@ -86,6 +86,21 @@ prfetchall = !sh -x -c 'git fetch upstream "+refs/pull/*/head:refs/remotes/$(git
 prunfetchall = !sh -x -c 'git branch --remote -d `git branch --remote | grep -E '/pr/[0-9]+$'`' -
 ```
 
+## Possible problems
+
+We use the remote HEAD to infer what the upstream branch is.  There
+are some problems with this:
+
+- it is only set when first cloned, if default branch changes it won't
+  be updated later.
+
+- If multiple branches had the same HEAD as the default branch, the
+  remote default branch can't be inferred automatically.
+
+- Setting the option NEW_ALWAYS_FETCH=1 in the file solves this, at
+  the cost of network access for `git pr new`.
+
+
 ## Other resources
 
 * This is seems nice for automatically fetching PRs: https://gist.github.com/piscisaureus/3342247
