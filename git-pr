@@ -7,9 +7,15 @@ inferred_origin="$(git remote | grep ^origin || git remote | grep ^upstream || g
 
 
 cmd=$1
-shift 1
+if [ "$1" ] ; then
+   shift 1
+fi
+# Master help option
+if [ "$1" = "-h" ] ; then
+    HELP=1
+fi
 
-case cmd in
+case $cmd in
 
     # Create a new HEAD suitable for a pull request.  Use
     # upstream/HEAD, origin/HEAD, or (the first remote)/HEAD as
