@@ -42,11 +42,15 @@ suitable for the local detached heads workflow.  If two
 arguments given, the first is a remote and the second is
 branch name.  If no arguments given, use the current branch
 name as the remote branch name (only works if you have a
-local branch).
+local branch).  If "-f" is *first* argument, then force push.
 EOF
 	    exit
 	fi
-	git push $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}
+	if [ "$1" = "-f" ] ; then
+	    FORCE=-f
+	    shift
+	fi
+	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}
 	;;
 
     di)
