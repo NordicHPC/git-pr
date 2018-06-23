@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# If set, then "git pr new" will always fetch the current upstream
+# HEAD and use that.  Doesn't fetch everything else from the upstream.
+NEW_ALWAYS_FETCH=1
+
+
 if [ "$VERBOSE" ] ; then
     set -x
 fi
@@ -24,13 +29,22 @@ case $cmd in
 	if test -n "$HELP" ; then
 	    cat <<EOF
 Create a new HEAD suitable for a pull request.  Use
-upstream/HEAD, origin/HEAD, or (the first remote)/HEAD as
+upstream/HEAD, origin/HEAD, or (inferred_upstream)/HEAD as
 the base.  If a argument is given, create a branch of this
 name, otherwise create a detached head here.
+
+If there is no ${inferred_upstream}/HEAD, then you can set it using:
+  git remote set-head ${inferred_upstream} SOME_BRANCH
 EOF
 	    exit
 	fi
-	git checkout $(test $1 && echo "-b" $1) ${inferred_upstream}/HEAD
+	# Fetch current HEAD always
+	if [ "$NEW_ALWAYS_FETCH" ] ; then
+	    git fetch ${inferred_upstream} HEAD
+	    git checkout $(test $1 && echo "-b" $1) FETCH_HEAD
+	else
+	    git checkout $(test $1 && echo "-b" $1) ${inferred_upstream}/HEAD
+	fi
 	;;
 
     push)
