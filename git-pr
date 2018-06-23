@@ -2,7 +2,7 @@
 
 # If set, then "git pr new" will always fetch the current upstream
 # HEAD and use that.  Doesn't fetch everything else from the upstream.
-NEW_ALWAYS_FETCH=1
+NEW_ALWAYS_FETCH=
 
 
 if [ "$VERBOSE" ] ; then
