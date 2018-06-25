@@ -91,7 +91,7 @@ functionality of the `git-pr` script.  If you can use the `git-pr`
 script, it is more powerful, but these old one-liners may still be
 useful to someone.
 
-```
+```shell
 # Create a new HEAD suitable for a pull request.  Use
 # upstream/HEAD, origin/HEAD, or (the first remote)/HEAD as
 # the base.  If a argument is given, create a branch of this
@@ -113,7 +113,6 @@ prdi = !git diff $(git merge-base $(git remote | grep upstream || git remote | g
 
 # Delete a branch (argument 1) both locally and remotely.
 prrm = !sh -x -c "'git branch | grep $1 && git branch -d $1 ; git branch -a | grep origin/$1 && git push origin :$1'" -
-
 
 # Fetch PR refs to local.  Give one PR numbers, and they will
 # be pulled as $remote/pr/$number.  (This should be modified
