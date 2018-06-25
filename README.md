@@ -1,8 +1,9 @@
 # Git pull request tools
 
-Everyone likes pull requests, but they can be a lot of keystrokes:
+Everyone abstractly likes pull requests, but they can be a lot of keystrokes:
 making new branches, pushing them, and especially keeping track of
-what can be deleted.
+what can be deleted.  This is an attempt to reduce the number of
+keystrokes to a bare minimum.
 
 ## PR workflows
 
@@ -25,10 +26,11 @@ There is actually an even shorter way (2):
 
 1. `git prnew`: create a detached head, don't even name it locally.
 
-2. Do work, commit, etc.
+2. Do work, commit, etc.  If you change your mind, no need to remove
+   anything.
 
 2. `git prpush $brname`: push to inferred upstream.  Note you need to
-   give a name since we don't have a local name.
+   give a name since we don't have a local branch name.
 
 3. You don't need to remove anything - remove branch remotely (via
    Github web) or delete your fork if this was really a one-time
@@ -41,12 +43,53 @@ Common assumptions:
 - The upstream remote is `upstream`, `origin`, or the first remote in
   the `git remote` output, whichever is found first.
 
-- You always push to the `origin` remote.
+- You always push the `origin`, `upstream`, or first remote found,
+  whichever comes first.
+
+
+## Installation and usage of `git-pr`
+
+In this repository, you find a shell script `git-pr` which, when
+placed anywhere on your `$PATH`, provides the following commands.  for
+each command, you can run `-h` to get help (with no arguments).  This
+is the recommended way to use this, because the shell script provides
+the most flexibility and power.
+
+* `git pr new`: create a new PR based on the current
+  `(inferred_upstream)/HEAD`.  See `-h` for some considerations.  Also
+  at the top of the script is a configuration option to force a
+  `fetch` before to make sure you are up to date.  With one argument,
+  create a branch of this name, otherwise create a detached head.
+
+* `git pr push`: Push a PR.  With no arguments, send to inferred
+  origin automatically with a name the same as the current branch.
+  With one argument, send to a branch of that name.  With two
+  arguments, the first is the remote name to use, and the second is
+  the branch name to push to.
+
+* `git pr di`: Diff between current working dir and merge-base of
+  inferred_upstream.
+
+* `git pr rm $branch_name`: Remove this branch, both locally and
+  on inferred_origin.
+
+* `git pr fetch $pr_number`: Fetch the given upstream PR to a new
+  local remote branch `inferred_upstream/pr/$pr_number`. (all fetch
+  commands support github at least)
+
+* `git pr fetchall`: Fetch all remote upstream PRs to local
+  repository.  Warning: this includes all PRs, open and closed.
+
+* `unfetchall`: Remove all `inferred_upstream/pr/$pr_number`
+  branches.  Warning: *all*.
 
 
 ## Aliases
 
-Currently commands are distributed as aliases.
+These are old aliases which predated and somewhat reproduce the
+functionality of the `git-pr` script.  If you can use the `git-pr`
+script, it is more powerful, but these old one-liners may still be
+useful to someone.
 
 ```
 # Create a new HEAD suitable for a pull request.  Use
@@ -92,13 +135,21 @@ We use the remote HEAD to infer what the upstream branch is.  There
 are some problems with this:
 
 - it is only set when first cloned, if default branch changes it won't
-  be updated later.
+  be updated later.  However, you can manually set this with `git
+  remote set-head ${inferred_upstream} $branch_name`
 
 - If multiple branches had the same HEAD as the default branch, the
   remote default branch can't be inferred automatically.
 
-- Setting the option NEW_ALWAYS_FETCH=1 in the file solves this, at
+- Setting the option `NEW_ALWAYS_FETCH=1` in the file solves this, at
   the cost of network access for `git pr new`.
+
+
+## Feedback
+
+Please send feedback.  By its very nature, this makes some choices
+about how workflows work.  If these can be improved to suit other
+workflows, or you have ideas, please send pull requests.
 
 
 ## Other resources
