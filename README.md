@@ -161,3 +161,7 @@ workflows, or you have ideas, please send pull requests.
   https://gist.github.com/metlos/9368527
 * Big library of aliases (not read yet, no obvious relevant ones): https://github.com/Ajedi32/git_aliases
 
+## License
+
+All content is released under the MIT license.  In addition, code and
+aliases are released into the public domain (CC0).  See LICENSE.
