@@ -28,10 +28,14 @@ case $cmd in
     new)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-Create a new HEAD suitable for a pull request.  Use
-upstream/HEAD, origin/HEAD, or (inferred_upstream)/HEAD as
-the base.  If a argument is given, create a branch of this
-name, otherwise create a detached head here.
+git pr new              (detached head)
+git pr new BRNAME
+
+Create a new HEAD suitable for a pull request.
+
+Use upstream/HEAD, origin/HEAD, or (inferred_upstream)/HEAD as the
+base.  If a argument is given, create a branch of this name, otherwise
+create a detached head here.
 
 If there is no ${inferred_upstream}/HEAD, then you can set it using:
   git remote set-head ${inferred_upstream} SOME_BRANCH
@@ -50,13 +54,18 @@ EOF
     push)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-Push a PR branch.  If one argument given, push to that
-branch on guessed remote (same logic as above).  This is
-suitable for the local detached heads workflow.  If two
-arguments given, the first is a remote and the second is
-branch name.  If no arguments given, use the current branch
-name as the remote branch name (only works if you have a
-local branch).  If "-f" is *first* argument, then force push.
+git pr push [-f]
+git pr push [-f] BRNAME
+git pr push [-f] REMOTE BRNAME
+
+Push a PR branch.
+
+If one argument given, push to that branch on guessed remote (same
+logic as above).  This is suitable for the local detached heads
+workflow.  If two arguments given, the first is a remote and the
+second is branch name.  If no arguments given, use the current branch
+name as the remote branch name (only works if you have a local
+branch).  If "-f" is *first* argument, then force push.
 EOF
 	    exit
 	fi
@@ -70,6 +79,8 @@ EOF
     di)
 	if test -n "$HELP" ; then
 	    cat <<EOF
+git pr diff
+
 Compare current working tree to upstream merge-base.  Uses
 same logic to find upstream merge base as "prnew"
 EOF
@@ -81,6 +92,8 @@ EOF
     rm)
 	if test -n "$HELP" ; then
 	    cat <<EOF
+git pr rm BRNAME
+
 Delete a branch (argument 1) both locally and remotely.
 EOF
 	    exit
@@ -92,6 +105,8 @@ EOF
     fetch)
 	if test -n "$HELP" ; then
 	    cat <<EOF
+git pr fetch PR_NUMBER
+
 Fetch PR refs to local.  Give one PR numbers, and they will
 be pulled as $remote/pr/$number.  (This should be modified
 to take multiple PR numbers)
@@ -104,7 +119,9 @@ EOF
     fetchall)
 	if test -n "$HELP" ; then
 	    cat <<EOF
- Fetch all PRs from a certain remote
+git pr fetchall
+
+Fetch all PRs from a certain remote
 EOF
 	    exit
 	fi
@@ -114,6 +131,8 @@ EOF
     unfetchall)
 	if test -n "$HELP" ; then
 	    cat <<EOF
+git pr unfetchall
+
 Delete everything fetched by prfetchall.  Note, this deletes
 these refs from *all* remotes, not just the default
 upstream.  It will delete anything matching '/pr/[0-9]+'
