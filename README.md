@@ -75,7 +75,7 @@ the most flexibility and power.
 
 * `git pr fetch $pr_number`: Fetch the given upstream PR to a new
   local remote branch `inferred_upstream/pr/$pr_number`. (all fetch
-  commands support github at least)
+  commands support github.com and gitlab.com at least)
 
 * `git pr fetchall`: Fetch all remote upstream PRs to local
   repository.  Warning: this includes all PRs, open and closed.

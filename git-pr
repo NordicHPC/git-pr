@@ -11,6 +11,23 @@ fi
 
 inferred_upstream="$(git remote | grep ^upstream || git remote | grep ^origin || git remote | head -1)"
 inferred_origin="$(git remote | grep ^origin || git remote | grep ^upstream || git remote | head -1)"
+infer_remote_type() {
+    # Determine if remote is github, gitlab, etc.  Should *always*
+    # return one option (set default here)
+    # Set remote_type and return
+    remote="$1"
+    full_remote="$(git remote get-url $1 2>/dev/null)"
+    if [ $? -eq 0 ] ; then
+	remote="$full_remote"
+    fi
+    if expr match "$remote" ".*github" ; then
+	remote_type="github" ; return
+    elif expr match "$remote" ".*gitlab" ; then
+	remote_type="gitlab" ; return
+    else
+	remote_type=${GIT_PR_DEFAULT_TYPE:-github}  # Default value
+    fi
+}
 
 
 print_help () {
@@ -128,8 +145,16 @@ to take multiple PR numbers)
 EOF
 	    exit
 	fi
-	git fetch ${inferred_upstream} --refmap="+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/pull/$1/head
-	;;
+	infer_remote_type ${inferred_upstream}  # sets variable remote_type
+	if [ "$remote_type" = "github" ] ; then
+	    git fetch ${inferred_upstream} --refmap="+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/pull/$1/head
+	elif [ "$remote_type" = "gitlab" ] ; then
+	    git fetch ${inferred_upstream} --refmap="+refs/merge-requests/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/merge-requests/$1/head
+	else
+	    echo "script internal error: infer_remote_type should always return something"
+	    exit 1
+	fi
+	    ;;
 
     fetchall)
 	if test -n "$HELP" ; then
@@ -140,7 +165,15 @@ Fetch all PRs from a certain remote
 EOF
 	    exit
 	fi
-	git fetch upstream "+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*"
+	infer_remote_type ${inferred_upstream}
+	if [ "$remote_type" = "github" ] ; then
+	    git fetch ${inferred_upstream} "+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*"
+	elif [ "$remote_type" = "gitlab" ] ; then
+	    git fetch ${inferred_upstream} "+refs/merge-requests/*/head:refs/remotes/${inferred_upstream}/pr/*"
+	else
+	    echo "script internal error: infer_remote_type should always return something"
+	    exit 1
+	fi
 	;;
 
     unfetchall)
