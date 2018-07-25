@@ -13,18 +13,33 @@ inferred_upstream="$(git remote | grep ^upstream || git remote | grep ^origin ||
 inferred_origin="$(git remote | grep ^origin || git remote | grep ^upstream || git remote | head -1)"
 
 
+print_help () {
+    cat <<EOF
+Git pull requset helper.
+
+Subcommands: new, push, di, rm, fetch, fetchall, unfetchall.
+EOF
+}
+
 # Get main subcommand
 cmd=$1
 if [ "$1" ] ; then
    shift 1
 fi
-# Master help option
-if [ "$1" = "-h" ] ; then
+
+# Subcommand help options
+if [ "$1" = "-h" -o "$1" = "--help" ] ; then
     HELP=1
 fi
 
 case $cmd in
 
+    -h*|--h*|help)
+	 # Note: --help does not work since git tries to invoke "man
+	 # git-pr" instead of invoking the script
+	 print_help
+	 exit
+	 ;;
     new)
 	if test -n "$HELP" ; then
 	    cat <<EOF
