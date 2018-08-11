@@ -124,20 +124,22 @@ EOF
     rm)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr rm BRNAME
+git pr rm BRNAME [...]
 
 Delete a branch (argument 1) both locally and remotely.
 EOF
 	    exit
 	fi
-	git branch | grep $1 && git branch -d $1
-	git branch -a | grep ${inferred_origin}/$1 && git push ${inferred_origin} :$1
+	for brname in "$@"; do
+	    git branch | grep $brname && git branch -d $brname
+	    git branch -a | grep ${inferred_origin}/$brname && git push ${inferred_origin} :$brname
+	done
 	;;
 
     fetch)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr fetch PR_NUMBER
+git pr fetch PR_NUMBER [...]
 
 Fetch PR refs to local.  Give one PR numbers, and they will
 be pulled as $remote/pr/$number.  (This should be modified
@@ -146,15 +148,17 @@ EOF
 	    exit
 	fi
 	infer_remote_type ${inferred_upstream}  # sets variable remote_type
-	if [ "$remote_type" = "github" ] ; then
-	    git fetch ${inferred_upstream} --refmap="+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/pull/$1/head
-	elif [ "$remote_type" = "gitlab" ] ; then
-	    git fetch ${inferred_upstream} --refmap="+refs/merge-requests/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/merge-requests/$1/head
-	else
-	    echo "script internal error: infer_remote_type should always return something"
-	    exit 1
-	fi
-	    ;;
+	for prnum in "$@"; do
+	    if [ "$remote_type" = "github" ] ; then
+	        git fetch ${inferred_upstream} --refmap="+refs/pull/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/pull/$prnum/head
+	    elif [ "$remote_type" = "gitlab" ] ; then
+	        git fetch ${inferred_upstream} --refmap="+refs/merge-requests/*/head:refs/remotes/${inferred_upstream}/pr/*" refs/merge-requests/$prnum/head
+	    else
+	        echo "script internal error: infer_remote_type should always return something"
+	        exit 1
+	    fi
+	done
+	;;
 
     fetchall)
 	if test -n "$HELP" ; then
