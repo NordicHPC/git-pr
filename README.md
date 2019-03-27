@@ -41,10 +41,15 @@ There is actually an even shorter way (2):
 Common assumptions:
 
 - The upstream remote is `upstream`, `origin`, or the first remote in
-  the `git remote` output, whichever is found first.
+  the `git remote` output, whichever is found first.  The idea is that
+  if you add a remote named `upstream`, it will use that by default.
 
-- You always push the `origin`, `upstream`, or first remote found,
-  whichever comes first.
+- You push to the `local`, `origin`, `upstream`, or first remote in
+  the `git remote` output, whatever comes first.  The idea is that you
+  add a remote called `local`, it will push to that by default.
+  Combined with the above, no matter if you originally clone the
+  upstream or personal fork, you can at most add one more remote and
+  get started (without having to adjust remote names).
 
 
 ## Installation and usage of `git-pr`
