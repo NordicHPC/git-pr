@@ -10,7 +10,7 @@ if [ "$VERBOSE" ] ; then
 fi
 
 inferred_upstream="$(git remote | grep ^upstream || git remote | grep ^origin || git remote | head -1)"
-inferred_origin="$(git remote | grep ^origin || git remote | grep ^upstream || git remote | head -1)"
+inferred_origin="$(git remote | grep ^local || git remote | grep ^origin || git remote | grep ^upstream || git remote | head -1)"
 infer_remote_type() {
     # Determine if remote is github, gitlab, etc.  Should *always*
     # return one option (set default here)
