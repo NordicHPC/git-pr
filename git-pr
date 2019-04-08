@@ -80,6 +80,14 @@ EOF
 	    git checkout $(test $1 && echo "-b" $1) FETCH_HEAD
 	else
 	    git checkout $(test $1 && echo "-b" $1) ${inferred_upstream}/HEAD
+	    if [ $? -eq 128 ] ; then
+		echo ""
+		echo "ERROR:"
+		echo "There seems to be no ${inferred_upstream}/HEAD, which happens when you add a"
+                echo "new remote instead of cloning the repo (this is just how git works."
+		echo "Add HEAD with this ('master' is the branch name):"
+		echo "  git remote set-head ${inferred_upstream} master"
+	    fi
 	fi
 	;;
 
