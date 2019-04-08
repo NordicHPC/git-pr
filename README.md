@@ -5,17 +5,32 @@ making new branches, pushing them, and especially keeping track of
 what can be deleted.  This is an attempt to reduce the number of
 keystrokes to a bare minimum.
 
+Features:
+
+* Create new PR branch: `git pr new $name`
+* Push PR branch: `git pr push $name`
+* Automatically detect personal and upstream remotes names - when you
+  need to start PRs, just add a remote if you need: best option based
+  on names `local`, `upstream`, `origin` (see below).
+* Anonymous PR branches (no local branch, only operating detached)
+* Fetch existing PR branches by number
+* Automatic diffs against upstream HEAD and PR branch: `git pr di`
+* Delete local and remote branches at same time: `git pr rm`
+* Support for Gitlab and Github
+* Single shell script
+
+
 ## PR workflows
 
 Here is our current short PR workflow (1):
 
-1. `git prnew $brname`: create a new branch based on inferred
+1. `git pr new $brname`: create a new branch based on inferred
    `upstream/HEAD`.  (note: we don't currently automatically
    re-fetch).
 
 2. Do work, commit, etc.
 
-3. `git prpush`: Infer current branch name and push to inferred
+3. `git pr push`: Infer current branch name and push to inferred
    remote.  You can give a different name to push to a different
    branch.
 
@@ -24,12 +39,12 @@ Here is our current short PR workflow (1):
 
 There is actually an even shorter way (2):
 
-1. `git prnew`: create a detached head, don't even name it locally.
+1. `git pr new`: create a detached head, don't even name it locally.
 
 2. Do work, commit, etc.  If you change your mind, no need to remove
    anything.
 
-2. `git prpush $brname`: push to inferred upstream.  Note you need to
+2. `git pr push $brname`: push to inferred upstream.  Note you need to
    give a name since we don't have a local branch name.
 
 3. You don't need to remove anything - remove branch remotely (via
@@ -164,8 +179,14 @@ workflows, or you have ideas, please send pull requests.
 * Has some super complicated aliases which I haven't examined yet:
   https://gist.github.com/metlos/9368527
 * Big library of aliases (not read yet, no obvious relevant ones): https://github.com/Ajedi32/git_aliases
+* Other projects of the same name
+  * Fetches PRs using a PHP script: https://github.com/ozh/git-pr
+  * May use Github CLI to make PRs: https://github.com/cladmi/git-pr/
+
 
 ## License
 
 All content is released under the MIT license.  In addition, code and
 aliases are released into the public domain (CC0).  See LICENSE.
+
+Note: the repository was called git-pr-tools until 2019-04-08.
