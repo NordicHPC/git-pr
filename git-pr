@@ -125,6 +125,10 @@ EOF
 	    shift
 	fi
 	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}"
+	if [ -z "$remote_branch" ] ; then
+	    echo "Not currently on a branch, must spetify branch name."
+	    exit 1
+	fi
 	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/$remote_branch
 
 	if [ -n "$MAKE_PR" ] ; then
@@ -177,6 +181,10 @@ EOF
 	    shift
 	else
 	    branch=$(git symbolic-ref HEAD | cut -d/ -f3)
+	    if [ -z "$branch" ] ; then
+		echo "Not currently on a branch, must spetify branch name"
+		exit 1
+	    fi
 	fi
 
 	# Extract Github owner/repo from URL.  We do this beacuse:
