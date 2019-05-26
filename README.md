@@ -34,7 +34,10 @@ Here is our current short PR workflow (1):
    remote.  You can give a different name to push to a different
    branch.
 
-4. Once you are done, `git prrm $brname` to remove both local and
+4. `git pr gh`: (Github only for now) Infer current branch, upstream, etc. and
+   create a Github PR using the command line.
+
+5. Once you are done, `git prrm $brname` to remove both local and
    remote branches (again inferring upstream remote).
 
 There is actually an even shorter way (2):
@@ -44,8 +47,9 @@ There is actually an even shorter way (2):
 2. Do work, commit, etc.  If you change your mind, no need to remove
    anything.
 
-2. `git pr push $brname`: push to inferred upstream.  Note you need to
-   give a name since we don't have a local branch name.
+2. `git pr push [-r] $brname`: push to inferred upstream.  Note you need to
+   give a name since we don't have a local branch name.  The [-r]
+   option creates a pull request.
 
 3. You don't need to remove anything - remove branch remotely (via
    Github web) or delete your fork if this was really a one-time
@@ -70,10 +74,18 @@ Common assumptions:
 ## Installation and usage of `git-pr`
 
 In this repository, you find a shell script `git-pr` which, when
-placed anywhere on your `$PATH`, provides the following commands.  for
-each command, you can run `-h` to get help (with no arguments).  This
-is the recommended way to use this, because the shell script provides
-the most flexibility and power.
+placed anywhere on your `$PATH`, provides the following commands.
+There are no dependencies and the goal is that this is written in pure
+(modern) Unix shell.
+
+For Github pull requests, you must install the
+[hub](https://github.com/github/hub) command line tool (Recent
+Debian-based: `apt install hub`).
+
+## Usage
+
+For each command, you can run `-h` to get help (with no arguments).
+Only a brief description is shown here.
 
 * `git pr new`: create a new PR based on the current
   `(inferred_upstream)/HEAD`.  See `-h` for some considerations.  Also
@@ -81,14 +93,22 @@ the most flexibility and power.
   `fetch` before to make sure you are up to date.  With one argument,
   create a branch of this name, otherwise create a detached head.
 
-* `git pr push`: Push a PR.  With no arguments, send to inferred
+* `git pr [-r] push`: Push a PR.  With no arguments, send to inferred
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
-  the branch name to push to.
+  the branch name to push to.  The `-r` option will create a pull
+  request at the same time (recursive invocation of `git pr gh`).
 
 * `git pr di`: Diff between current working dir and merge-base of
   inferred_upstream.
+
+* `git pr gh`: Create a Github pull request from the command line,
+  using the same type of logic as `git push` uses.  In general, it
+  does the right thing if you have just pushed a named branch.  If you
+  have pushed a detached head, you must give the branch name when
+  using this command.  (This will eventually be extended to support
+  Gitlab, etc.)
 
 * `git pr rm $branch_name`: Remove this branch, both locally and
   on inferred_origin.
@@ -104,7 +124,7 @@ the most flexibility and power.
   branches.  Warning: *all*.
 
 
-## Aliases
+## Aliases (obsolete)
 
 These are old aliases which predated and somewhat reproduce the
 functionality of the `git-pr` script.  If you can use the `git-pr`
