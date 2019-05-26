@@ -198,8 +198,8 @@ EOF
 	# hub annoyingly requires you to be on a branch, even if it's
 	# not being used.  So we make a temporary branch and delete it
 	# after.
-	tmp_branch="git-pr-gh-tmp-branch-$RANDOM"
-	git checkout -B $tmp_branch  >> /dev/null  2>&1
+	tmp_branch="git-pr-gh-tmp-branch-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
+	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
 	trap 'git checkout @{-1} ;  git br -D $tmp_branch' EXIT
 
 	$HUB pull-request --head="$head_owner:$branch" "$@"
