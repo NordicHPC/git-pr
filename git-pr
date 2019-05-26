@@ -3,7 +3,8 @@
 # If set, then "git pr new" will always fetch the current upstream
 # HEAD and use that.  Doesn't fetch everything else from the upstream.
 NEW_ALWAYS_FETCH=
-
+# Github cli program "hub" path
+HUB=hub
 
 if [ "$VERBOSE" ] ; then
     set -x
@@ -21,9 +22,9 @@ infer_remote_type() {
     if [ $? -eq 0 ] ; then
 	remote="$full_remote"
     fi
-    if expr match "$remote" ".*github" ; then
+    if expr match "$remote" ".*github" > /dev/null ; then
 	remote_type="github" ; return
-    elif expr match "$remote" ".*gitlab" ; then
+    elif expr match "$remote" ".*gitlab" > /dev/null ; then
 	remote_type="gitlab" ; return
     else
 	remote_type=${GIT_PR_DEFAULT_TYPE:-github}  # Default value
@@ -97,7 +98,7 @@ EOF
 	    cat <<EOF
 git pr push [-f]
 git pr push [-f] BRNAME
-git pr push [-f] REMOTE BRNAME
+git pr push [-f] [-r] REMOTE BRNAME
 
 Push a PR branch.
 
@@ -106,7 +107,12 @@ logic as above).  This is suitable for the local detached heads
 workflow.  If two arguments given, the first is a remote and the
 second is branch name.  If no arguments given, use the current branch
 name as the remote branch name (only works if you have a local
-branch).  If "-f" is *first* argument, then force push.
+branch).
+
+If "-f" is *first* argument, then force push.  If "-r" is after that,
+automatically make a PR (using "git pr gh").  The options have to be
+in this order if they are given.
+
 EOF
 	    exit
 	fi
@@ -114,7 +120,21 @@ EOF
 	    FORCE=-f
 	    shift
 	fi
-	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}
+	if [ "$1" = "-r" ] ; then
+	    MAKE_PR=1
+	    shift
+	fi
+	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}"
+	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/$remote_branch
+
+	if [ -n "$MAKE_PR" ] ; then
+	    infer_remote_type ${inferred_upstream}
+	    if [ "$remote_type" = "github" ] ; then
+		$0 gh $remote_branch
+	    else
+		echo "Can't make PR, can only make PRs for github right now."
+	    fi
+	fi
 	;;
 
     di)
@@ -128,6 +148,58 @@ EOF
 	    exit
 	fi
 	git diff $(git merge-base ${inferred_upstream}/HEAD HEAD)
+	;;
+
+    gh)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr gh [BRNAME]
+
+Create a Github pull request using the command line.  If you have
+pushed a named branch using `git pr push`, this will just do the right
+thing.  If you have pushed a detached head using `git pr push BRNAME`,
+you should give the same branch name here because we can't (yet) infer the
+name you used to push.
+
+This can be automatically invoked by the `-r` option in `git pr push
+-r`.
+EOF
+	    exit
+	fi
+	if ! which $HUB >> /dev/null ; then
+	    echo "Please install the hub command line program:"
+	    echo "  https://github.com/github/hub"
+	    exit 1
+	fi
+
+	if [ -n "$1" ] ; then
+	    branch="$1"
+	    shift
+	else
+	    branch=$(git symbolic-ref HEAD | cut -d/ -f3)
+	fi
+
+	# Extract Github owner/repo from URL.  We do this beacuse:
+	# - Our logic for origin is different than hub's default.
+	# - So we always specify the --head
+	# - We support not making a local branch.
+	head_info=$(echo $(git remote get-url --push $inferred_origin) | sed -E 's@.*[:/]([^/]+)/([^./:]*).*@\1:\2@')
+	head_owner="${head_info%%:*}"
+	head_repo="${head_info##*:}"
+
+	# hub annoyingly requires you to be on a branch, even if it's
+	# not being used.  So we make a temporary branch and delete it
+	# after.
+	tmp_branch="git-pr-gh-tmp-branch-$RANDOM"
+	git checkout -B $tmp_branch  >> /dev/null  2>&1
+	trap 'git checkout @{-1} ;  git br -D $tmp_branch' EXIT
+
+	$HUB pull-request --head="$head_owner:$branch" "$@"
+
+	# Reset HEAD back...
+	git checkout @{-1} >> /dev/null  2>&1
+	git br -D "$tmp_branch" >> /dev/null  2>&1
+	trap EXIT  # untrap the cleanup command.
 	;;
 
     rm)
@@ -203,6 +275,6 @@ EOF
 	git branch --remote -d `git branch --remote | grep -E '/pr/[0-9]+$'`
 	;;
     *)
-	echo "Valid commands: new push di rm fetch fetchall unfetchall"
+	echo "Valid commands: new push di rm gh fetch fetchall unfetchall"
 	;;
 esac
