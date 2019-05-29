@@ -130,8 +130,15 @@ EOF
 	    exit 1
 	fi
 	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/$remote_branch
+	PUSH_RET=$?
 
 	if [ -n "$MAKE_PR" ] ; then
+	    if [ $PUSH_RET -ne 0 ] ; then
+		echo
+		echo 'The git push was not successful... not creatining pull request.'
+		exit $PUSH_RET
+	    fi
+
 	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "github" ] ; then
 		$0 gh $remote_branch
