@@ -233,7 +233,7 @@ EOF
 	fi
 	git fetch $inferred_upstream
 	git fetch $inferred_origin --prune
-	git branch -a --merged ${inferred_upstream}/HEAD
+	git --no-pager branch -a --merged ${inferred_upstream}/HEAD
 	;;
 
     rm)
