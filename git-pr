@@ -34,9 +34,12 @@ infer_remote_type() {
 
 print_help () {
     cat <<EOF
-Git pull requset helper.
+gi-pr: git pull requset helper.
 
-Subcommands: new, push, di, rm, fetch, fetchall, unfetchall.
+Subcommands:
+  Usual work:  new, push, di, gh
+  Cleaning up:  merged, rm, prune
+  Fetching PR branches:  fetch, fetchall, unfetchall
 EOF
 }
 
@@ -325,6 +328,8 @@ EOF
 	;;
 
     *)
-	echo "Valid commands: new push di rm gh fetch fetchall unfetchall prune"
+	echo "Error: No valid git-pr subcommand command given: $cmd"
+	echo
+	print_help
 	;;
 esac
