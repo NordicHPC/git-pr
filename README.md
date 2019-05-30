@@ -110,8 +110,18 @@ Only a brief description is shown here.
   using this command.  (This will eventually be extended to support
   Gitlab, etc.)
 
-* `git pr rm $branch_name`: Remove this branch, both locally and
-  on inferred_origin.
+* `git pr merged`: show local and remote branches which can be
+  removed.  A small wrapper around `git branch --merged` that always
+  checks relative to upstream/HEAD.  Automatically does fetches and
+  remote reference prunes.  (I welcome UI suggestions for this and the
+  two following commands, how to properly do things automatically.)
+
+* `git pr rm $branch_name ...`: Remove named branches, both locally
+  and on inferred_origin.
+
+* `git pr prune`: Remove remote tracking references already deleted
+  upstream (just a shorthand for `git fetch $inferred_origin
+  --prune`).  Note it also fetches.
 
 * `git pr fetch $pr_number`: Fetch the given upstream PR to a new
   local remote branch `inferred_upstream/pr/$pr_number`. (all fetch
