@@ -34,9 +34,12 @@ infer_remote_type() {
 
 print_help () {
     cat <<EOF
-Git pull requset helper.
+gi-pr: git pull requset helper.
 
-Subcommands: new, push, di, rm, fetch, fetchall, unfetchall.
+Subcommands:
+  Usual work:  new, push, di, gh
+  Cleaning up:  merged, rm, prune
+  Fetching PR branches:  fetch, fetchall, unfetchall
 EOF
 }
 
@@ -217,19 +220,53 @@ EOF
 	trap EXIT  # untrap the cleanup command.
 	;;
 
+    merged)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr merged
+
+List merged branches.  Similar to "git branch --merged" but uses the
+upstream HEAD by default.  Automatically does fetches and remote
+prunes.
+EOF
+	    exit
+	fi
+	git fetch $inferred_upstream
+	git fetch $inferred_origin --prune
+	git --no-pager branch -a --merged ${inferred_upstream}/HEAD
+	;;
+
     rm)
 	if test -n "$HELP" ; then
 	    cat <<EOF
 git pr rm BRNAME [...]
 
-Delete a branch (argument 1) both locally and remotely.
+Delete a branch (argument 1) both locally and remotely.  You may want
+to "git fetch -a" first.
 EOF
 	    exit
 	fi
 	for brname in "$@"; do
-	    git branch | grep $brname && git branch -d $brname
-	    git branch -a | grep ${inferred_origin}/$brname && git push ${inferred_origin} :$brname
+	    brname=${brname#remotes/${inferred_origin}/}
+	    # Check if branch exists before trying to rm it.
+	    git branch | grep " $brname\$" && git branch -d $brname
+	    git branch -a | grep " remotes/${inferred_origin}/$brname\$" && git push ${inferred_origin} :$brname
 	done
+	;;
+
+    prune)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr prune
+
+Remove remote tracking references that are already deleted upstream.  This
+is just as shorthand for other git commands that do this.
+EOF
+	    exit
+	fi
+	# Delete stale references associated with $name.  Also update
+	# other remote tracking refs, because why not...
+	git fetch $inferred_origin --prune
 	;;
 
     fetch)
@@ -289,7 +326,10 @@ EOF
 	fi
 	git branch --remote -d `git branch --remote | grep -E '/pr/[0-9]+$'`
 	;;
+
     *)
-	echo "Valid commands: new push di rm gh fetch fetchall unfetchall"
+	echo "Error: No valid git-pr subcommand command given: $cmd"
+	echo
+	print_help
 	;;
 esac
