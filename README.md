@@ -3,7 +3,12 @@
 Everyone abstractly likes pull requests, but they can be a lot of keystrokes:
 making new branches, pushing them, and especially keeping track of
 what can be deleted.  This is an attempt to reduce the number of
-keystrokes to a bare minimum.
+keystrokes to a bare minimum.:
+
+* `git pr new BRANCH_NAME` - make a new branch based on inferred
+  upstream HEAD.
+* `git pr push -r` - push current branch to inferred origin,
+  automatically make Github pull request.
 
 Features:
 
@@ -17,6 +22,7 @@ Features:
 * Automatic diffs against upstream HEAD and PR branch: `git pr di`
 * Delete local and remote branches at same time: `git pr rm`
 * Support for Gitlab and Github
+* Support for automatically making Github PRs.
 * Single shell script
 
 
@@ -35,7 +41,8 @@ Here is our current short PR workflow (1):
    branch.
 
 4. `git pr gh`: (Github only for now) Infer current branch, upstream, etc. and
-   create a Github PR using the command line.
+   create a Github PR using the command line.  Use `git pr push [-r]`
+   to do this automatically.
 
 5. Once you are done, `git prrm $brname` to remove both local and
    remote branches (again inferring upstream remote).
@@ -47,36 +54,39 @@ There is actually an even shorter way (2):
 2. Do work, commit, etc.  If you change your mind, no need to remove
    anything.
 
-2. `git pr push [-r] $brname`: push to inferred upstream.  Note you need to
-   give a name since we don't have a local branch name.  The [-r]
+3. `git pr push [-r] $brname`: push to inferred upstream.  Note you need to
+   give a name since we don't have a local branch name.  The `[-r]`
    option creates a pull request.
 
-3. You don't need to remove anything - remove branch remotely (via
+4. You don't need to remove anything - remove branch remotely (via
    Github web) or delete your fork if this was really a one-time
    thing.
 
 
 
-Common assumptions:
+## Common assumptions (repository setup)
 
 - The upstream remote is `upstream`, `origin`, or the first remote in
   the `git remote` output, whichever is found first.  The idea is that
-  if you add a remote named `upstream`, it will use that by default.
+  if you add a remote named `upstream`, it will use that by default if
+  you cloned your fork.
 
 - You push to the `local`, `origin`, `upstream`, or first remote in
-  the `git remote` output, whatever comes first.  The idea is that you
+  the `git remote` output, whatever comes first.  The idea is that if
+  you cloned the upstream, if you
   add a remote called `local`, it will push to that by default.
-  Combined with the above, no matter if you originally clone the
-  upstream or personal fork, you can at most add one more remote and
-  get started (without having to adjust remote names).
+
+Taken together, no matter if you originally clone the upstream or personal
+fork, you can at most add one more remote and get started (without
+having to adjust remote names).
 
 
 ## Installation and usage of `git-pr`
 
 In this repository, you find a shell script `git-pr` which, when
 placed anywhere on your `$PATH`, provides the following commands.
-There are no dependencies and the goal is that this is written in pure
-(modern) Unix shell.
+There are no unusual dependencies and the goal is to work in
+POSIX shell (it's developed in `dash`).
 
 For Github pull requests, you must install the
 [hub](https://github.com/github/hub) command line tool (Recent
@@ -210,3 +220,6 @@ All content is released under the MIT license.  In addition, code and
 aliases are released into the public domain (CC0).  See LICENSE.
 
 Note: the repository was called git-pr-tools until 2019-04-08.
+
+`git-pr` is hosted under the NordicHPC umbrella.  Current primary
+developer is Richard Darst, Aalto University (Finland) Science-IT.
