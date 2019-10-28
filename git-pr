@@ -127,7 +127,7 @@ EOF
 	    MAKE_PR=1
 	    shift
 	fi
-	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3)}}"
+	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3-)}}"
 	if [ -z "$remote_branch" ] ; then
 	    echo "Not currently on a branch, must spetify branch name."
 	    exit 1
