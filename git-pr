@@ -195,7 +195,7 @@ EOF
 	    branch="$1"
 	    shift
 	else
-	    branch=$(git symbolic-ref HEAD | cut -d/ -f3)
+	    branch=$(git symbolic-ref HEAD | cut -d/ -f3-)
 	    if [ -z "$branch" ] ; then
 		echo "Not currently on a branch, must spetify branch name"
 		exit 1
