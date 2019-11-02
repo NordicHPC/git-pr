@@ -84,12 +84,19 @@ EOF
 	    FORCE=-B
 	    shift
 	fi
+	branch_prefix="$(git config --get git-pr.branchprefix)"
+	brname="$1"
+	# If branch name is given AND branch_prefix is given, use
+	# "branch_prefix/branch_name" as the actual branch name.
+	if [ -n "$brname" -a "$inferred_upstream" = "$inferred_origin" ] ; then
+	    brname="${branch_prefix}${brname}"
+	fi
 	# Fetch current HEAD always
 	if [ "$NEW_ALWAYS_FETCH" ] ; then
 	    git fetch ${inferred_upstream} HEAD
-	    git checkout $(test $1 && echo $FORCE $1) FETCH_HEAD
+	    git checkout $(test $brname && echo $FORCE $brname) FETCH_HEAD
 	else
-	    git checkout $(test $1 && echo $FORCE $1) ${inferred_upstream}/HEAD
+	    git checkout $(test $brname && echo $FORCE $brname) ${inferred_upstream}/HEAD
 	    if [ $? -eq 128 ] ; then
 		echo ""
 		echo "ERROR:"

@@ -144,6 +144,18 @@ Only a brief description is shown here.
   branches.  Warning: *all*.
 
 
+## Configuration
+
+* **branch name prefix:** You may want to always prefix your branches
+  with your name, e.g. `rkdarst/auto-prefix`.  You can set the a git
+  variable using `git config --global git-pr.branchprefix PREFIX/`, and
+  any branch you try to create will have this prefixed to it.  Note:
+  include a trailing `/` or whatever character with your config
+  option.  This is only applied if your `$inferred_upstream` is the
+  same as your `$inferred_origin` (in other words, if you have a
+  separate personal repository, this won't be added).
+
+
 ## Aliases (obsolete)
 
 These are old aliases which predated and somewhat reproduce the
