@@ -140,8 +140,14 @@ Only a brief description is shown here.
 * `git pr fetchall`: Fetch all remote upstream PRs to local
   repository.  Warning: this includes all PRs, open and closed.
 
-* `unfetchall`: Remove all `inferred_upstream/pr/$pr_number`
-  branches.  Warning: *all*.
+* `git pr unfetchall`: Remove all `$inferred_upstream/pr/[0-9]+$`
+  branches (remove remote tracking branch is opposite of fetch).
+  Warning: *all*.
+
+* `git pr unfetchmerged`: Remove all PR branches (see above) branches
+  which are merged (according to `--git branch --merged
+  $inferred_origin/HEAD`).  Since you can't fetch just unmerged PRs,
+  normally you would do `fetchall` followed by `unfetchmerged`.
 
 
 ## Configuration
