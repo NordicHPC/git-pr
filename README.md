@@ -122,9 +122,9 @@ Only a brief description is shown here.
 
 * `git pr merged`: show local and remote branches which can be
   removed.  A small wrapper around `git branch --merged` that always
-  checks relative to upstream/HEAD.  Automatically does fetches and
-  remote reference prunes.  (I welcome UI suggestions for this and the
-  two following commands, how to properly do things automatically.)
+  checks relative to upstream/HEAD.  (I welcome UI suggestions for
+  this and the two following commands, how to properly do things
+  automatically.)
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
   and on inferred_origin.

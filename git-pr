@@ -238,13 +238,10 @@ EOF
 git pr merged
 
 List merged branches.  Similar to "git branch --merged" but uses the
-upstream HEAD by default.  Automatically does fetches and remote
-prunes.
+upstream HEAD by default.
 EOF
 	    exit
 	fi
-	git fetch $inferred_upstream
-	git fetch $inferred_origin --prune
 	git --no-pager branch -a --merged ${inferred_upstream}/HEAD
 	;;
 
