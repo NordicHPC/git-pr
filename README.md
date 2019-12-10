@@ -103,22 +103,25 @@ Only a brief description is shown here.
   `fetch` before to make sure you are up to date.  With one argument,
   create a branch of this name, otherwise create a detached head.
 
-* `git pr [-r] push`: Push a PR.  With no arguments, send to inferred
+* `git pr [-d] [-r] push`: Push a PR.  With no arguments, send to inferred
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
   the branch name to push to.  The `-r` option will create a pull
-  request at the same time (recursive invocation of `git pr gh`).
+  request at the same time (recursive invocation of `git pr gh`).  The
+  `-d` option creates a draft pull request.  The options have to be
+  separate and in the order show (alphabetical), because the authors
+  haven't made proper argument processing yet.
 
 * `git pr di`: Diff between current working dir and merge-base of
   inferred_upstream.
 
-* `git pr gh`: Create a Github pull request from the command line,
+* `git pr gh [-d]`: Create a Github pull request from the command line,
   using the same type of logic as `git push` uses.  In general, it
   does the right thing if you have just pushed a named branch.  If you
   have pushed a detached head, you must give the branch name when
   using this command.  (This will eventually be extended to support
-  Gitlab, etc.)
+  Gitlab, etc.)  `-d` creates a draft pull request.
 
 * `git pr merged`: show local and remote branches which can be
   removed.  A small wrapper around `git branch --merged` that always
