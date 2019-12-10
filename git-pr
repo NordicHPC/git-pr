@@ -173,7 +173,7 @@ same logic to find upstream merge base as "prnew"
 EOF
 	    exit
 	fi
-	git diff $(git merge-base ${inferred_upstream}/HEAD HEAD)
+	git diff $(git merge-base ${inferred_upstream}/HEAD HEAD) "$@"
 	;;
 
     gh)
