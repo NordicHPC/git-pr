@@ -111,9 +111,9 @@ EOF
     push)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr push [-f]
-git pr push [-f] BRNAME
-git pr push [-f] [-r] REMOTE BRNAME
+git pr push [-d] [-f] [-r]
+git pr push [-d] [-f] [-r] BRNAME
+git pr push [-d] [-f] [-r] REMOTE BRNAME
 
 Push a PR branch.
 
@@ -125,11 +125,16 @@ name as the remote branch name (only works if you have a local
 branch).
 
 If "-f" is *first* argument, then force push.  If "-r" is after that,
-automatically make a PR (using "git pr gh").  The options have to be
-in this order if they are given.
+automatically make a PR (using "git pr gh").  `-d` is as in the `gh`
+subcommand (draft pull request).  The options have to be in this order
+if they are given.
 
 EOF
 	    exit
+	fi
+	if [ "$1" = "-d" ] ; then
+	    PR_DRAFT="-d"
+	    shift
 	fi
 	if [ "$1" = "-f" ] ; then
 	    FORCE=-f
@@ -156,7 +161,7 @@ EOF
 
 	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "github" ] ; then
-		$0 gh $remote_branch
+		$0 gh $PR_DRAFT $remote_branch
 	    else
 		echo "Can't make PR, can only make PRs for github right now."
 	    fi
@@ -179,7 +184,7 @@ EOF
     gh)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr gh [BRNAME]
+git pr gh [-d] [BRNAME]
 
 Create a Github pull request using the command line.  If you have
 pushed a named branch using `git pr push`, this will just do the right
@@ -189,6 +194,9 @@ name you used to push.
 
 This can be automatically invoked by the `-r` option in `git pr push
 -r`.
+
+`-d` creates a draft pull request, and if given arguments have to be
+in the order shown.
 EOF
 	    exit
 	fi
@@ -196,6 +204,10 @@ EOF
 	    echo "Please install the hub command line program:"
 	    echo "  https://github.com/github/hub"
 	    exit 1
+	fi
+	if [ "$1" = "-d" ] ; then
+	    PR_DRAFT="-d"
+	    shift
 	fi
 
 	if [ -n "$1" ] ; then
@@ -224,7 +236,7 @@ EOF
 	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
 	trap 'git checkout @{-1} ;  git br -D $tmp_branch' EXIT
 
-	$HUB pull-request --head="$head_owner:$branch" "$@"
+	$HUB pull-request $PR_DRAFT --head="$head_owner:$branch" "$@"
 
 	# Reset HEAD back...
 	git checkout @{-1} >> /dev/null  2>&1
