@@ -348,7 +348,20 @@ upstream.  It will delete anything matching '/pr/[0-9]+'
 EOF
 	    exit
 	fi
-	git branch --remote -d `git branch --remote | grep -E '/pr/[0-9]+$'`
+	git branch --remote -d $(git branch --remote ${inferred_upstream}/HEAD | grep -E "$inferred_upstream/pr/[0-9]\+$")
+	;;
+
+    unfetchmerged)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr unfetchmerged
+
+Delete everything fetched by prfetchall that has already been merged.
+It will delete anything matching '$upstream/pr/[0-9]+'
+EOF
+	    exit
+	fi
+	git branch --remote --quiet -d $(git branch --remote --merged ${inferred_upstream}/HEAD | grep "$inferred_upstream/pr/[0-9]\+$")
 	;;
 
     *)
