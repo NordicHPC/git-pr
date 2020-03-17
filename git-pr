@@ -142,6 +142,13 @@ EOF
 	fi
 	if [ "$1" = "-r" ] ; then
 	    MAKE_PR=1
+	    infer_remote_type ${inferred_upstream}
+	    if [ "$remote_type" = "gitlab" ] ; then
+		# https://stackoverflow.com/a/55940401
+		# https://docs.gitlab.com/ce/user/project/push_options.html
+		# Available in git>=2.10 and gitlab>=11.10
+		$GITLAB_CREATE_PR="--push-option=merge_request.create"
+	    fi
 	    shift
 	fi
 	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3-)}}"
@@ -149,7 +156,9 @@ EOF
 	    echo "Not currently on a branch, must spetify branch name."
 	    exit 1
 	fi
-	git push $FORCE $(test $2 && echo $1 || echo ${inferred_origin}) HEAD:refs/heads/$remote_branch
+	git push $FORCE $GITLAB_CREATE_PR \
+	    $(test $2 && echo $1 || echo ${inferred_origin}) \
+	    HEAD:refs/heads/$remote_branch
 	PUSH_RET=$?
 
 	if [ -n "$MAKE_PR" ] ; then
@@ -159,7 +168,6 @@ EOF
 		exit $PUSH_RET
 	    fi
 
-	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "github" ] ; then
 		$0 gh $PR_DRAFT $remote_branch
 	    else

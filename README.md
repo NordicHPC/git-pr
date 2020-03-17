@@ -22,7 +22,7 @@ Features:
 * Automatic diffs against upstream HEAD and PR branch: `git pr di`
 * Delete local and remote branches at same time: `git pr rm`
 * Support for Gitlab and Github
-* Support for automatically making Github PRs.
+* Support for automatically making PRs/MRs (Github and gitlab>11.10).
 * Single shell script
 
 
@@ -103,15 +103,22 @@ Only a brief description is shown here.
   `fetch` before to make sure you are up to date.  With one argument,
   create a branch of this name, otherwise create a detached head.
 
-* `git pr [-d] [-r] push`: Push a PR.  With no arguments, send to inferred
+* `git pr push [-d] [-r]`: Push a PR.  With no arguments, send to inferred
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
-  the branch name to push to.  The `-r` option will create a pull
-  request at the same time (recursive invocation of `git pr gh`).  The
-  `-d` option creates a draft pull request.  The options have to be
-  separate and in the order show (alphabetical), because the authors
+  the branch name to push to.  The options have to be
+  separate and in the order shown (alphabetical), because I
   haven't made proper argument processing yet.
+
+  Github: The `-r` option will create a pull
+  request at the same time (recursive invocation of `git pr gh`).  The
+  `-d` option creates a draft pull request.
+
+  Gitlab: The `-r` option will create a merge request with git>=2.10
+  and Gitlab>=11.10.  This is only opened on invocations that actually
+  push something, since this uses [git push
+  options](https://docs.gitlab.com/ce/user/project/push_options.html).
 
 * `git pr di`: Diff between current working dir and merge-base of
   inferred_upstream.
@@ -121,7 +128,8 @@ Only a brief description is shown here.
   does the right thing if you have just pushed a named branch.  If you
   have pushed a detached head, you must give the branch name when
   using this command.  (This will eventually be extended to support
-  Gitlab, etc.)  `-d` creates a draft pull request.
+  Gitlab, etc. - for now opening a merge request can be done in the
+  `git pr push -r` command)  `-d` creates a draft pull request.
 
 * `git pr merged`: show local and remote branches which can be
   removed.  A small wrapper around `git branch --merged` that always
