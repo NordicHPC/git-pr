@@ -258,11 +258,50 @@ EOF
 git pr merged
 
 List merged branches.  Similar to "git branch --merged" but uses the
-upstream HEAD by default.
+upstream HEAD by default.  Use "git pr prune" to delete them.
 EOF
 	    exit
 	fi
+	# arg parsing
+	while getopts "d" arg ; do
+	    case $arg in
+		d) MERGED_DELETE="1" ;;
+	    esac
+	done
+	shift $((OPTIND-1))
+	#
 	git --no-pager branch -a --merged ${inferred_upstream}/HEAD
+	;;
+
+    prune)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr prune
+
+Remove merged local branches and remote tracking references that are
+already deleted upstream.  This is just as shorthand for other git
+commands that do this.  Roughly, this should delete what you see in "git pr merged".  (This command is beta)
+
+EOF
+	    exit
+	fi
+	# Delete stale references associated with $name.  Also update
+	# other remote tracking refs, because why not...
+	git fetch ${inferred_upstream} --prune
+	test -n "${inferred_origin}" && git fetch ${inferred_origin} --prune
+
+	echo "local"
+	git --no-pager branch --merged ${inferred_upstream}/HEAD \
+	    | cut -c3- | cut -d' ' -f1 \
+	    | grep -E -v 'master|HEAD|gh-pages' \
+	    | xargs git branch --delete
+	echo "remote"
+	git --no-pager branch --remote --merged ${inferred_upstream}/HEAD \
+	    | cut -c3- \
+	    | grep "^${inferred_origin}/" \
+	    | cut -d' ' -f1 \
+	    | grep -E -v 'master|HEAD|gh-pages' | cut -d/ -f2- \
+	    | xargs git push --delete ${inferred_origin}
 	;;
 
     rm)
@@ -281,21 +320,6 @@ EOF
 	    git branch | grep " $brname\$" && git branch -d $brname
 	    git branch -a | grep " remotes/${inferred_origin}/$brname\$" && git push ${inferred_origin} :$brname
 	done
-	;;
-
-    prune)
-	if test -n "$HELP" ; then
-	    cat <<EOF
-git pr prune
-
-Remove remote tracking references that are already deleted upstream.  This
-is just as shorthand for other git commands that do this.
-EOF
-	    exit
-	fi
-	# Delete stale references associated with $name.  Also update
-	# other remote tracking refs, because why not...
-	git fetch $inferred_origin --prune
 	;;
 
     fetch)
