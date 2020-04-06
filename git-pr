@@ -80,10 +80,14 @@ EOF
 	    exit
 	fi
 	FORCE=-b
-	if [ "$1" = "-f" ] ; then
-	    FORCE=-B
-	    shift
-	fi
+	# arg parsing
+	while getopts "f" arg ; do
+	    case $arg in
+		f) FORCE="-B" ;;
+	    esac
+	done
+	shift $((OPTIND-1))
+	#
 	branch_prefix="$(git config --get git-pr.branchprefix)"
 	brname="$1"
 	# If branch name is given AND branch_prefix is given, use
@@ -132,16 +136,17 @@ if they are given.
 EOF
 	    exit
 	fi
-	if [ "$1" = "-d" ] ; then
-	    PR_DRAFT="-d"
-	    shift
-	fi
-	if [ "$1" = "-f" ] ; then
-	    FORCE=-f
-	    shift
-	fi
-	if [ "$1" = "-r" ] ; then
-	    MAKE_PR=1
+	# arg parsing
+	while getopts "dfr" arg ; do
+	    case $arg in
+		d) PR_DRAFT="-d" ;;
+		f) FORCE="-f" ;;
+		r) MAKE_PR=1 ;;
+	    esac
+	done
+	shift $((OPTIND-1))
+	#
+	if [ -n "$MAKE_PR" ] ; then
 	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "gitlab" ] ; then
 		# https://stackoverflow.com/a/55940401
@@ -213,10 +218,14 @@ EOF
 	    echo "  https://github.com/github/hub"
 	    exit 1
 	fi
-	if [ "$1" = "-d" ] ; then
-	    PR_DRAFT="-d"
-	    shift
-	fi
+	# arg parsing
+	while getopts "d" arg ; do
+	    case $arg in
+		d) PR_DRAFT="-d" ;;
+	    esac
+	done
+	shift $((OPTIND-1))
+	#
 
 	if [ -n "$1" ] ; then
 	    branch="$1"
