@@ -154,7 +154,6 @@ EOF
 		# Available in git>=2.10 and gitlab>=11.10
 		$GITLAB_CREATE_PR="--push-option=merge_request.create"
 	    fi
-	    shift
 	fi
 	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3-)}}"
 	if [ -z "$remote_branch" ] ; then
