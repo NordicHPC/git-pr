@@ -44,7 +44,7 @@ Here is our current short PR workflow (1):
    create a Github PR using the command line.  Use `git pr push [-r]`
    to do this automatically.
 
-5. Once you are done, `git prrm $brname` to remove both local and
+5. Once you are done, `git pr rm $brname` to remove both local and
    remote branches (again inferring upstream remote).
 
 There is actually an even shorter way (2):
