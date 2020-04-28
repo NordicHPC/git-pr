@@ -27,7 +27,7 @@ infer_remote_type() {
     elif expr match "$remote" ".*gitlab" > /dev/null ; then
 	remote_type="gitlab" ; return
     else
-	remote_type=${GIT_PR_DEFAULT_TYPE:-github}  # Default value
+	remote_type=${GIT_PR_DEFAULT_TYPE:-gitlab}  # Default value
     fi
 }
 
@@ -149,10 +149,12 @@ EOF
 	if [ -n "$MAKE_PR" ] ; then
 	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "gitlab" ] ; then
+		echo "Trying to make a Gitlab pull request..."
 		# https://stackoverflow.com/a/55940401
 		# https://docs.gitlab.com/ce/user/project/push_options.html
 		# Available in git>=2.10 and gitlab>=11.10
-		$GITLAB_CREATE_PR="--push-option=merge_request.create"
+		GITLAB_CREATE_PR="--push-option=merge_request.create"
+		unset MAKE_PR
 	    fi
 	fi
 	remote_branch="${2:-${1:-$(git symbolic-ref HEAD | cut -d/ -f3-)}}"
@@ -165,18 +167,18 @@ EOF
 	    HEAD:refs/heads/$remote_branch
 	PUSH_RET=$?
 
-	if [ -n "$MAKE_PR" ] ; then
+	if [ -n "$MAKE_PR" -a "$remote_type" = "github" ] ; then
+	    echo "Trying to make a Github pull request..."
 	    if [ $PUSH_RET -ne 0 ] ; then
 		echo
 		echo 'The git push was not successful... not creatining pull request.'
 		exit $PUSH_RET
 	    fi
-
-	    if [ "$remote_type" = "github" ] ; then
-		$0 gh $PR_DRAFT $remote_branch
-	    else
-		echo "Can't make PR, can only make PRs for github right now."
-	    fi
+	    $0 gh $PR_DRAFT $remote_branch
+	    unset MAKE_PR
+	fi
+	if [ -n "$MAKE_PR" ] ; then
+	    echo "Can't make PR, can only make PRs for Gitlab/Github right now."
 	fi
 	;;
 

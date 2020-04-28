@@ -127,9 +127,8 @@ Only a brief description is shown here.
   using the same type of logic as `git push` uses.  In general, it
   does the right thing if you have just pushed a named branch.  If you
   have pushed a detached head, you must give the branch name when
-  using this command.  (This will eventually be extended to support
-  Gitlab, etc. - for now opening a merge request can be done in the
-  `git pr push -r` command)  `-d` creates a draft pull request.
+  using this command.  (Gitlab pull requests are done within `git pr
+  push`)  `-d` creates a draft pull request.
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
   and on inferred_origin.
