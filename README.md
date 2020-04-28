@@ -26,23 +26,34 @@ Features:
 * Single shell script
 
 
+## Installation
+
+In this repository, you find a shell script `git-pr` which, when
+placed anywhere on your `$PATH` and made executable (`chmod a+rx
+git-pr`), provides the following commands.
+There are no dependencies except POSIX shell (we hope - it's developed
+in `dash`).
+
+To automatically open Github pull requests, you must install the
+[hub](https://github.com/github/hub) command line tool (Recent
+Debian-based: `apt install hub`).  Gitlab pull requests require
+git>=2.10 and Gitlab>=11.10.
+
+
+
 ## PR workflows
 
 Here is our current short PR workflow (1):
 
 1. `git pr new $brname`: create a new branch based on inferred
-   `upstream/HEAD`.  (note: we don't currently automatically
-   re-fetch).
+   `upstream/HEAD`.  (note: fetch first if you want to be sure to be
+   up to date)
 
 2. Do work, commit, etc.
 
-3. `git pr push`: Infer current branch name and push to inferred
-   remote.  You can give a different name to push to a different
-   branch.
-
-4. `git pr gh`: (Github only for now) Infer current branch, upstream, etc. and
-   create a Github PR using the command line.  Use `git pr push [-r]`
-   to do this automatically.
+3. `git pr push [-r]`: Infer upstream remote automatically and push to
+   branch matching local branch name.  The `-r` option automatically
+   opens a MR/PR (Gitlab/Github).
 
 5. Once you are done, `git pr rm $brname` to remove both local and
    remote branches (again inferring upstream remote).
@@ -56,7 +67,7 @@ There is actually an even shorter way (2):
 
 3. `git pr push [-r] $brname`: push to inferred upstream.  Note you need to
    give a name since we don't have a local branch name.  The `[-r]`
-   option creates a pull request.
+   option again creates a pull request.
 
 4. You don't need to remove anything - remove branch remotely (via
    Github web) or delete your fork if this was really a one-time
@@ -68,8 +79,8 @@ There is actually an even shorter way (2):
 
 - The upstream remote is `upstream`, `origin`, or the first remote in
   the `git remote` output, whichever is found first.  The idea is that
-  if you add a remote named `upstream`, it will use that by default if
-  you cloned your fork.
+  if you add a remote named `upstream`, it will use that by default
+  (if `origin` isn't it already the upstream).
 
 - You push to the `local`, `origin`, `upstream`, or first remote in
   the `git remote` output, whatever comes first.  The idea is that if
@@ -78,19 +89,9 @@ There is actually an even shorter way (2):
 
 Taken together, no matter if you originally clone the upstream or personal
 fork, you can at most add one more remote and get started (without
-having to adjust remote names).
+having to rename any remotes).
 
 
-## Installation and usage of `git-pr`
-
-In this repository, you find a shell script `git-pr` which, when
-placed anywhere on your `$PATH`, provides the following commands.
-There are no unusual dependencies and the goal is to work in
-POSIX shell (it's developed in `dash`).
-
-For Github pull requests, you must install the
-[hub](https://github.com/github/hub) command line tool (Recent
-Debian-based: `apt install hub`).
 
 ## Usage
 
@@ -127,9 +128,8 @@ Only a brief description is shown here.
   using the same type of logic as `git push` uses.  In general, it
   does the right thing if you have just pushed a named branch.  If you
   have pushed a detached head, you must give the branch name when
-  using this command.  (This will eventually be extended to support
-  Gitlab, etc. - for now opening a merge request can be done in the
-  `git pr push -r` command)  `-d` creates a draft pull request.
+  using this command.  (Gitlab pull requests are done within `git pr
+  push`).  `-d` creates a draft pull request.
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
   and on inferred_origin.
@@ -251,6 +251,8 @@ workflows, or you have ideas, please send pull requests.
 * Other projects of the same name
   * Fetches PRs using a PHP script: https://github.com/ozh/git-pr
   * May use Github CLI to make PRs: https://github.com/cladmi/git-pr/
+* [Github CLI](https://cli.github.com/) (new April 2020) might take
+  place of git-pr (but probably won't support Gitlab).
 
 
 ## License
