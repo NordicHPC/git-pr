@@ -108,13 +108,11 @@ Only a brief description is shown here.
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
-  the branch name to push to.  The options have to be
-  separate and in the order shown (alphabetical), because I
-  haven't made proper argument processing yet.
+  the branch name to push to.
 
   Github: The `-r` option will create a pull
   request at the same time (recursive invocation of `git pr gh`).  The
-  `-d` option creates a draft pull request.
+  `-d` and `-n` options are passed to `git pr gh`.
 
   Gitlab: The `-r` option will create a merge request with git>=2.10
   and Gitlab>=11.10.  This is only opened on invocations that actually
@@ -129,7 +127,8 @@ Only a brief description is shown here.
   does the right thing if you have just pushed a named branch.  If you
   have pushed a detached head, you must give the branch name when
   using this command.  (Gitlab pull requests are done within `git pr
-  push`).  `-d` creates a draft pull request.
+  push`).  `-d` creates a draft pull request.  `-n` doesn't prompt to
+  edit the PR  first (`hub pull-request --no-edit`).
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
   and on inferred_origin.
