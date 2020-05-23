@@ -129,18 +129,18 @@ name as the remote branch name (only works if you have a local
 branch).
 
 If "-f" is *first* argument, then force push.  If "-r" is after that,
-automatically make a PR (using "git pr gh").  `-d` is as in the `gh`
-subcommand (draft pull request).  The options have to be in this order
-if they are given.
-
+automatically make a PR (using "git pr gh").  `-d` and `-n` as in the `gh`
+subcommand (draft pull request, don't edit PR message).  The options have
+to be before the arguments.
 EOF
 	    exit
 	fi
 	# arg parsing
-	while getopts "dfr" arg ; do
+	while getopts "dfnr" arg ; do
 	    case $arg in
 		d) PR_DRAFT="-d" ;;
 		f) FORCE="-f" ;;
+		n) PR_NO_EDIT="-n" ;;
 		r) MAKE_PR=1 ;;
 	    esac
 	done
@@ -174,7 +174,7 @@ EOF
 		echo 'The git push was not successful... not creatining pull request.'
 		exit $PUSH_RET
 	    fi
-	    $0 gh $PR_DRAFT $remote_branch
+	    $0 gh $PR_DRAFT $PR_NO_EDIT $remote_branch
 	    unset MAKE_PR
 	fi
 	if [ -n "$MAKE_PR" ] ; then
@@ -209,8 +209,10 @@ name you used to push.
 This can be automatically invoked by the `-r` option in `git pr push
 -r`.
 
-`-d` creates a draft pull request, and if given arguments have to be
-in the order shown.
+`-d` creates a draft pull request.
+`-n` does not edit the PR message before sending (`--no-edit` in the hub
+     command).
+The options have to be before the arguments
 EOF
 	    exit
 	fi
@@ -220,9 +222,10 @@ EOF
 	    exit 1
 	fi
 	# arg parsing
-	while getopts "d" arg ; do
+	while getopts "nd" arg ; do
 	    case $arg in
 		d) PR_DRAFT="-d" ;;
+		n) PR_NO_EDIT="--no-edit" ;;
 	    esac
 	done
 	shift $((OPTIND-1))
@@ -254,7 +257,7 @@ EOF
 	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
 	trap 'git checkout @{-1} ;  git br -D $tmp_branch' EXIT
 
-	$HUB pull-request $PR_DRAFT --head="$head_owner:$branch" "$@"
+	$HUB pull-request $PR_DRAFT $PR_NO_EDIT --head="$head_owner:$branch" "$@"
 
 	# Reset HEAD back...
 	git checkout @{-1} >> /dev/null  2>&1
