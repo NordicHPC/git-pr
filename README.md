@@ -159,6 +159,7 @@ Only a brief description is shown here.
   $inferred_origin/HEAD`).  Since you can't fetch just unmerged PRs,
   normally you would do `fetchall` followed by `unfetchmerged`.
 
+* `git pr info` prints the autodetected remotes and base branches.
 
 ## Configuration
 

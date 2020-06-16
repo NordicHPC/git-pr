@@ -12,6 +12,7 @@ fi
 
 inferred_upstream="$(git remote | grep --max-count=1 ^upstream || git remote | grep --max-count=1 ^origin || git remote | head -1)"
 inferred_origin="$(git remote | grep  --max-count=1 ^local || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
+#inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
 
 infer_remote_type() {
     # Determine if remote is github, gitlab, etc.  Should *always*
@@ -404,6 +405,14 @@ EOF
 	    exit
 	fi
 	git branch --remote --quiet -d $(git branch --remote --merged ${inferred_upstream}/HEAD | grep "$inferred_upstream/pr/[0-9]\+$")
+	;;
+
+    info)
+	inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
+	echo "Detected origin is ${inferred_origin}  (we push to here)"
+	echo "Detected upstream is ${inferred_upstream}  (we branch from here)"
+	echo "${inferred_upstream}/HEAD is $(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD)"
+	echo "Default base is ${inferred_head}  (fix with \"git remote set-head ${inferred_upstream} --auto\")"
 	;;
 
     *)
