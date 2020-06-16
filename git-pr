@@ -407,6 +407,30 @@ EOF
 	git branch --remote --quiet -d $(git branch --remote --merged ${inferred_upstream}/HEAD | grep "$inferred_upstream/pr/[0-9]\+$")
 	;;
 
+    master|main)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr main
+
+Check out the inferred main branch (local copy, not the remote
+tracking branch).  Useful if you want to commit to your base branch
+without PRs.
+EOF
+	    exit
+	fi
+	brname=$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d/ -f2-)
+	if test -n \"$brname\" ; then
+	    git checkout $brname ;
+	    [ $? = 0 ] && return 0
+	fi
+	for brname in main master gh-pages; do
+	    git branch --format='%(refname:short)' --list $brname \
+		| grep $brname > /dev/null \
+		&& git checkout $brname && exit 0
+	done
+
+	;;
+
     info)
 	inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
 	echo "Detected origin is ${inferred_origin}  (we push to here)"
