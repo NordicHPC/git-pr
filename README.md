@@ -159,6 +159,13 @@ Only a brief description is shown here.
   $inferred_origin/HEAD`).  Since you can't fetch just unmerged PRs,
   normally you would do `fetchall` followed by `unfetchmerged`.
 
+* `git pr main` (also aliased to `master`) will checkout the inferred
+  main base branch (your local branch, not the remote tracking
+  branch).  If it can't infer it from the remote's upstream, tries the
+  order `main`, `master`, `gh-pages` and checks out the first that
+  exists.
+
+* `git pr info` prints the autodetected remotes and base branches.
 
 ## Configuration
 

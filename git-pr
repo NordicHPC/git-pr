@@ -12,6 +12,7 @@ fi
 
 inferred_upstream="$(git remote | grep --max-count=1 ^upstream || git remote | grep --max-count=1 ^origin || git remote | head -1)"
 inferred_origin="$(git remote | grep  --max-count=1 ^local || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
+#inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
 
 infer_remote_type() {
     # Determine if remote is github, gitlab, etc.  Should *always*
@@ -106,8 +107,8 @@ EOF
 		echo "ERROR:"
 		echo "There seems to be no ${inferred_upstream}/HEAD, which happens when you add a"
                 echo "new remote instead of cloning the repo (this is just how git works."
-		echo "Add HEAD with this ('master' is the branch name):"
-		echo "  git remote set-head ${inferred_upstream} master"
+		echo "Add HEAD with:"
+		echo "  git remote set-head ${inferred_upstream} --auto"
 	    fi
 	fi
 	;;
@@ -404,6 +405,38 @@ EOF
 	    exit
 	fi
 	git branch --remote --quiet -d $(git branch --remote --merged ${inferred_upstream}/HEAD | grep "$inferred_upstream/pr/[0-9]\+$")
+	;;
+
+    master|main)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr main
+
+Check out the inferred main branch (local copy, not the remote
+tracking branch).  Useful if you want to commit to your base branch
+without PRs.
+EOF
+	    exit
+	fi
+	brname=$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d/ -f2-)
+	if test -n \"$brname\" ; then
+	    git checkout $brname ;
+	    [ $? = 0 ] && return 0
+	fi
+	for brname in main master gh-pages; do
+	    git branch --format='%(refname:short)' --list $brname \
+		| grep $brname > /dev/null \
+		&& git checkout $brname && exit 0
+	done
+
+	;;
+
+    info)
+	inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
+	echo "Detected origin is ${inferred_origin}  (we push to here)"
+	echo "Detected upstream is ${inferred_upstream}  (we branch from here)"
+	echo "${inferred_upstream}/HEAD is $(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD)"
+	echo "Default base is ${inferred_head}  (fix with \"git remote set-head ${inferred_upstream} --auto\")"
 	;;
 
     *)
