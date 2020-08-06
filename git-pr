@@ -140,7 +140,7 @@ EOF
 	while getopts "dfnr" arg ; do
 	    case $arg in
 		d) PR_DRAFT="-d" ;;
-		f) FORCE="-f" ;;
+		f) FORCE="--force-with-lease" ;;
 		n) PR_NO_EDIT="-n" ;;
 		r) MAKE_PR=1 ;;
 	    esac
