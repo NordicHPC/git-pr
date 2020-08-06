@@ -41,6 +41,7 @@ Subcommands:
   Usual work:  new, push, di, gh
   Cleaning up:  merged, rm, prune
   Fetching PR branches:  fetch, fetchall, unfetchall
+  Meta: info, set-head
 EOF
 }
 
@@ -437,6 +438,18 @@ EOF
 	echo "Detected upstream is ${inferred_upstream}  (we branch from here)"
 	echo "${inferred_upstream}/HEAD is $(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD)"
 	echo "Default base is ${inferred_head}  (fix with \"git remote set-head ${inferred_upstream} --auto\")"
+	;;
+
+    set-head)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr set-head
+
+Check the remote and set the remote default branch.
+EOF
+	    exit
+	fi
+	git remote set-head ${inferred_upstream} --auto
 	;;
 
     *)

@@ -167,6 +167,8 @@ Only a brief description is shown here.
 
 * `git pr info` prints the autodetected remotes and base branches.
 
+* `git pr set-head` checks the remote and sets the remote default branch.
+
 ## Configuration
 
 * **branch name prefix:** You may want to always prefix your branches
