@@ -220,6 +220,7 @@ EOF
 	if ! which $HUB >> /dev/null ; then
 	    echo "Please install the hub command line program:"
 	    echo "  https://github.com/github/hub"
+	    echo "  binary download: https://github.com/github/hub/releases"
 	    exit 1
 	fi
 	# arg parsing
@@ -342,8 +343,7 @@ EOF
 git pr fetch PR_NUMBER [...]
 
 Fetch PR refs to local.  Give one PR numbers, and they will
-be pulled as $remote/pr/$number.  (This should be modified
-to take multiple PR numbers)
+be pulled as $remote/pr/$number.
 EOF
 	    exit
 	fi
