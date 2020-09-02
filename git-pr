@@ -35,7 +35,7 @@ infer_remote_type() {
 
 print_help () {
     cat <<EOF
-gi-pr: git pull requset helper.
+git-pr: git pull request helper.
 
 Subcommands:
   Usual work:  new, push, di, gh
@@ -107,7 +107,7 @@ EOF
 		echo ""
 		echo "ERROR:"
 		echo "There seems to be no ${inferred_upstream}/HEAD, which happens when you add a"
-                echo "new remote instead of cloning the repo (this is just how git works."
+		echo "new remote instead of cloning the repo (this is just how git works)."
 		echo "Add HEAD with:"
 		echo "  git remote set-head ${inferred_upstream} --auto"
 	    fi
