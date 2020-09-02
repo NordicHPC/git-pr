@@ -258,13 +258,13 @@ EOF
 	# after.
 	tmp_branch="git-pr-gh-tmp-branch-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
 	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
-	trap 'git checkout @{-1} ;  git br -D $tmp_branch' EXIT
+	trap 'git checkout @{-1} ;  git branch -D $tmp_branch' EXIT
 
 	$HUB pull-request $PR_DRAFT $PR_NO_EDIT --head="$head_owner:$branch" "$@"
 
 	# Reset HEAD back...
 	git checkout @{-1} >> /dev/null  2>&1
-	git br -D "$tmp_branch" >> /dev/null  2>&1
+	git branch -D "$tmp_branch" >> /dev/null  2>&1
 	trap EXIT  # untrap the cleanup command.
 	;;
 
