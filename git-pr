@@ -131,7 +131,7 @@ name as the remote branch name (only works if you have a local
 branch).
 
 If "-f" is *first* argument, then force push.  If "-r" is after that,
-automatically make a PR (using "git pr gh").  `-d` and `-n` as in the `gh`
+automatically make a PR (using "git pr gh"). "-d" and "-n" as in the "gh"
 subcommand (draft pull request, don't edit PR message).  The options have
 to be before the arguments.
 EOF
@@ -203,16 +203,16 @@ EOF
 git pr gh [-d] [BRNAME]
 
 Create a Github pull request using the command line.  If you have
-pushed a named branch using `git pr push`, this will just do the right
-thing.  If you have pushed a detached head using `git pr push BRNAME`,
+pushed a named branch using "git pr push", this will just do the right
+thing.  If you have pushed a detached head using "git pr push BRNAME",
 you should give the same branch name here because we can't (yet) infer the
 name you used to push.
 
-This can be automatically invoked by the `-r` option in `git pr push
--r`.
+This can be automatically invoked by the "-r" option in "git pr push
+-r".
 
-`-d` creates a draft pull request.
-`-n` does not edit the PR message before sending (`--no-edit` in the hub
+"-d" creates a draft pull request.
+"-n" does not edit the PR message before sending ("--no-edit" in the hub
      command).
 The options have to be before the arguments
 EOF
