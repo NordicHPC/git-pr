@@ -5,14 +5,14 @@ making new branches, pushing them, and especially keeping track of
 what can be deleted.  This is an attempt to reduce the number of
 keystrokes to a bare minimum.:
 
-* `git pr new BRANCH_NAME` - make a new branch based on inferred
+* `git pr branch BRANCH_NAME` - make a new branch based on inferred
   upstream HEAD.
 * `git pr push -r` - push current branch to inferred origin,
   automatically make Github pull request.
 
 Features:
 
-* Create new PR branch: `git pr new $name`
+* Create new PR branch: `git pr branch $name`
 * Push PR branch: `git pr push $name`
 * Automatically detect personal and upstream remotes names - when you
   need to start PRs, just add a remote if you need: best option based
@@ -45,7 +45,7 @@ git>=2.10 and Gitlab>=11.10.
 
 Here is our current short PR workflow (1):
 
-1. `git pr new $brname`: create a new branch based on inferred
+1. `git pr branch $brname`: create a new branch based on inferred
    `upstream/HEAD`.  (note: fetch first if you want to be sure to be
    up to date)
 
@@ -60,7 +60,7 @@ Here is our current short PR workflow (1):
 
 There is actually an even shorter way (2):
 
-1. `git pr new`: create a detached head, don't even name it locally.
+1. `git pr branch`: create a detached head, don't even name it locally.
 
 2. Do work, commit, etc.  If you change your mind, no need to remove
    anything.
@@ -98,7 +98,7 @@ having to rename any remotes).
 For each command, you can run `-h` to get help (with no arguments).
 Only a brief description is shown here.
 
-* `git pr new`: create a new PR based on the current
+* `git pr branch`: create a new PR based on the current
   `(inferred_upstream)/HEAD`.  See `-h` for some considerations.  Also
   at the top of the script is a configuration option to force a
   `fetch` before to make sure you are up to date.  With one argument,
@@ -195,7 +195,7 @@ are some problems with this:
   remote default branch can't be inferred automatically.
 
 - Setting the option `NEW_ALWAYS_FETCH=1` in the file solves this, at
-  the cost of network access for `git pr new`.
+  the cost of network access for `git pr branch`.
 
 
 ## Feedback

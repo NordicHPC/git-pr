@@ -38,7 +38,7 @@ print_help () {
 git-pr: git pull request helper.
 
 Subcommands:
-  Usual work:  new, push, di, gh
+  Usual work:  branch, push, di, gh
   Cleaning up:  merged, rm, prune
   Fetching PR branches:  fetch, fetchall, unfetchall
   Meta: info, set-head
@@ -64,11 +64,11 @@ case $cmd in
 	 print_help
 	 exit
 	 ;;
-    new)
+    branch|br|new)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr new              (detached head)
-git pr new BRNAME
+git pr branch              (detached head)
+git pr branch BRNAME
 
 Create a new HEAD suitable for a pull request.
 
@@ -190,7 +190,7 @@ EOF
 git pr diff
 
 Compare current working tree to upstream merge-base.  Uses
-same logic to find upstream merge base as "prnew"
+same logic to find upstream merge base as "pr branch"
 EOF
 	    exit
 	fi
