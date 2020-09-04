@@ -19,7 +19,7 @@ Features:
   on names `local`, `upstream`, `origin` (see below).
 * Anonymous PR branches (no local branch, only operating detached)
 * Fetch existing PR branches by number
-* Automatic diffs against upstream HEAD and PR branch: `git pr di`
+* Automatic diffs against upstream HEAD and PR branch: `git pr diff`
 * Delete local and remote branches at same time: `git pr rm`
 * Support for Gitlab and Github
 * Support for automatically making PRs/MRs (Github and gitlab>11.10).
@@ -119,7 +119,7 @@ Only a brief description is shown here.
   push something, since this uses [git push
   options](https://docs.gitlab.com/ce/user/project/push_options.html).
 
-* `git pr di`: Diff between current working dir and merge-base of
+* `git pr diff`: Diff between current working dir and merge-base of
   inferred_upstream.
 
 * `git pr gh [-d]`: Create a Github pull request from the command line,
