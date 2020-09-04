@@ -41,7 +41,7 @@ print_help () {
 git-pr: git pull request helper.
 
 Subcommands:
-  Usual work:  branch, push, di, gh
+  Usual work:  branch, push, di, open
   Cleaning up:  merged, rm, prune
   Fetching PR branches:  fetch, fetchall, unfetchall
   Meta: info, set-head
@@ -121,9 +121,9 @@ EOF
     push)
 	if test -n "$HELP" ; then
 	    cat <<EOF
-git pr push [-d] [-f] [-r]
-git pr push [-d] [-f] [-r] BRNAME
-git pr push [-d] [-f] [-r] REMOTE BRNAME
+git pr push [-d] [-f] [-o]
+git pr push [-d] [-f] [-o] BRNAME
+git pr push [-d] [-f] [-o] REMOTE BRNAME
 
 Push a PR branch.
 
@@ -134,21 +134,22 @@ second is branch name.  If no arguments given, use the current branch
 name as the remote branch name (only works if you have a local
 branch).
 
-If "-f" is *first* argument, then force push.  If "-r" is after that,
-automatically make a PR (using "git pr gh"). "-d" and "-n" as in the "gh"
-subcommand (draft pull request, don't edit PR message).  The options have
-to be before the arguments.
+The options have to be before the arguments:
+-d   Open as a draft pull request (Github only)
+-f   Force push
+-n   Don't edit PR message before sending
+-o   Open a pull request, too (Gitlab/Github)
 EOF
 	    exit
 	fi
 	infer_remotes
 	# arg parsing
-	while getopts "dfnr" arg ; do
+	while getopts "dfnor" arg ; do
 	    case $arg in
 		d) PR_DRAFT="-d" ;;
 		f) FORCE="--force-with-lease" ;;
 		n) PR_NO_EDIT="-n" ;;
-		r) MAKE_PR=1 ;;
+		o|r) MAKE_PR=1 ;;
 	    esac
 	done
 	shift $((OPTIND-1))
@@ -187,6 +188,20 @@ EOF
 	if [ -n "$MAKE_PR" ] ; then
 	    echo "Can't make PR, can only make PRs for Gitlab/Github right now."
 	fi
+	;;
+
+    open)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr open [...]
+
+Push and open a pull request.  Opening is connected to pushing, so see
+"git pr push" for other options you can hive here.  This is a wrapper
+around "git pr push -o".
+
+EOF
+	fi
+	$0 push -o "$@"
 	;;
 
     di)
