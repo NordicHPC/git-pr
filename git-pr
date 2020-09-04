@@ -41,7 +41,7 @@ print_help () {
 git-pr: git pull request helper.
 
 Subcommands:
-  Usual work:  branch, push, di, open
+  Usual work:  branch, push, diff, open
   Cleaning up:  merged, rm, prune
   Fetching PR branches:  fetch, fetchall, unfetchall
   Meta: info, set-head
@@ -204,7 +204,7 @@ EOF
 	$0 push -o "$@"
 	;;
 
-    di)
+    diff)
 	if test -n "$HELP" ; then
 	    cat <<EOF
 git pr diff
