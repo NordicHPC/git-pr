@@ -19,7 +19,7 @@ Features:
   on names `local`, `upstream`, `origin` (see below).
 * Anonymous PR branches (no local branch, only operating detached)
 * Fetch existing PR branches by number
-* Automatic diffs against upstream HEAD and PR branch: `git pr di`
+* Automatic diffs against upstream HEAD and PR branch: `git pr diff`
 * Delete local and remote branches at same time: `git pr rm`
 * Support for Gitlab and Github
 * Support for automatically making PRs/MRs (Github and gitlab>11.10).
@@ -124,7 +124,7 @@ Only a brief description is shown here.
 * `git pr open`: Push and open a pull request.  This is completely
   equivalent to `git pr push -o`, see above for documentation.
 
-* `git pr di`: Diff between current working dir and merge-base of
+* `git pr diff`: Diff between current working dir and merge-base of
   inferred_upstream.
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
