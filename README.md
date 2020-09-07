@@ -104,31 +104,28 @@ Only a brief description is shown here.
   `fetch` before to make sure you are up to date.  With one argument,
   create a branch of this name, otherwise create a detached head.
 
-* `git pr push [-d] [-r]`: Push a PR.  With no arguments, send to inferred
+* `git pr push [-d] [-o] [[remote] branchname]`: Push a PR.  With no
+  arguments, send to inferred
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
-  the branch name to push to.
+  the branch name to push to.  `-f` will force push.
 
-  Github: The `-r` option will create a pull
-  request at the same time (recursive invocation of `git pr gh`).  The
-  `-d` and `-n` options are passed to `git pr gh`.
+  Github: The `-o` option will create a pull
+  request at the same time.  `-n` will skip the "edit pull request
+  message" step and instead use the message from the (first) commit.
+  `-d` will open as a draft pull request.
 
   Gitlab: The `-r` option will create a merge request with git>=2.10
   and Gitlab>=11.10.  This is only opened on invocations that actually
   push something, since this uses [git push
   options](https://docs.gitlab.com/ce/user/project/push_options.html).
 
+* `git pr open`: Push and open a pull request.  This is completely
+  equivalent to `git pr push -o`, see above for documentation.
+
 * `git pr diff`: Diff between current working dir and merge-base of
   inferred_upstream.
-
-* `git pr gh [-d]`: Create a Github pull request from the command line,
-  using the same type of logic as `git push` uses.  In general, it
-  does the right thing if you have just pushed a named branch.  If you
-  have pushed a detached head, you must give the branch name when
-  using this command.  (Gitlab pull requests are done within `git pr
-  push`).  `-d` creates a draft pull request.  `-n` doesn't prompt to
-  edit the PR  first (`hub pull-request --no-edit`).
 
 * `git pr rm $branch_name ...`: Remove named branches, both locally
   and on inferred_origin.
