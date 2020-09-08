@@ -144,8 +144,10 @@ EOF
 	fi
 	infer_remotes
 	# arg parsing
-	while getopts "dfnor" arg ; do
+	while getopts "b:dfnor" arg ; do
 	    case $arg in
+		b) PR_TARGET_BRANCH="$OPTARG"
+		   PR_GITHUB_BASE="-b $OPTARG" ;;
 		d) PR_DRAFT="-d" ;;
 		f) FORCE="--force-with-lease" ;;
 		n) PR_NO_EDIT="-n" ;;
@@ -157,11 +159,14 @@ EOF
 	if [ -n "$MAKE_PR" ] ; then
 	    infer_remote_type ${inferred_upstream}
 	    if [ "$remote_type" = "gitlab" ] ; then
-		echo "Trying to make a Gitlab pull request..."
+		echo "Trying to make a Gitlab merge request..."
 		# https://stackoverflow.com/a/55940401
 		# https://docs.gitlab.com/ce/user/project/push_options.html
 		# Available in git>=2.10 and gitlab>=11.10
 		GITLAB_CREATE_PR="--push-option=merge_request.create"
+		if [ -n "$PR_TARGET_BRANCH" ] ; then
+		    GITLAB_CREATE_PR="$GITLAB_CREATE_PR --push-option=merge_request.target=$PR_TARGET_BRANCH"
+		fi
 		unset MAKE_PR
 	    fi
 	fi
@@ -176,13 +181,12 @@ EOF
 	PUSH_RET=$?
 
 	if [ -n "$MAKE_PR" -a "$remote_type" = "github" ] ; then
-	    echo "Trying to make a Github pull request..."
 	    if [ $PUSH_RET -ne 0 ] ; then
 		echo
 		echo 'The git push was not successful... not creatining pull request.'
 		exit $PUSH_RET
 	    fi
-	    $0 gh $PR_DRAFT $PR_NO_EDIT $remote_branch
+	    $0 gh $PR_DRAFT $PR_NO_EDIT $PR_GITHUB_BASE $remote_branch
 	    unset MAKE_PR
 	fi
 	if [ -n "$MAKE_PR" ] ; then
@@ -247,8 +251,10 @@ EOF
 	    exit 1
 	fi
 	# arg parsing
-	while getopts "nd" arg ; do
+	while getopts "b:nd" arg ; do
 	    case $arg in
+		b) PR_TARGET_BRANCH="$OPTARG"
+		   PR_GITHUB_BASE="-b $OPTARG" ;;
 		d) PR_DRAFT="-d" ;;
 		n) PR_NO_EDIT="--no-edit" ;;
 	    esac
@@ -282,7 +288,8 @@ EOF
 	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
 	trap 'git checkout @{-1} ;  git branch -D $tmp_branch' EXIT
 
-	$HUB pull-request $PR_DRAFT $PR_NO_EDIT --head="$head_owner:$branch" "$@"
+	echo "Trying to make a Github pull request..."
+	$HUB pull-request $PR_DRAFT $PR_NO_EDIT $PR_GITHUB_BASE --head="$head_owner:$branch" "$@"
 
 	# Reset HEAD back...
 	git checkout @{-1} >> /dev/null  2>&1

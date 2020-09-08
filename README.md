@@ -109,15 +109,21 @@ Only a brief description is shown here.
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
   arguments, the first is the remote name to use, and the second is
-  the branch name to push to.  `-f` will force push.
+  the branch name to push to.
 
-  Github: The `-o` option will create a pull
-  request at the same time.  `-n` will skip the "edit pull request
-  message" step and instead use the message from the (first) commit.
-  `-d` will open as a draft pull request.
+  * `-f`: Force push
+  * `-o`: Create a pull request at the same time (Github/Gitlab).
+    Gitlab merge requests work with git>=2.10 and Gitlab>=11.10.
 
-  Gitlab: The `-r` option will create a merge request with git>=2.10
-  and Gitlab>=11.10.  This is only opened on invocations that actually
+  When opening a pull request, these options are available:
+
+  * `-n`: skip the "edit pull request message" step and instead use
+    the message from the (first) commit. (Github)
+  * `-d`: Will open as a draft pull request.  (Github)
+  * `-b {branch_name}`: Target the named branch as the base branch to
+    merge into (Github/Gitlab)
+
+  Gitlab merge requests are only opened on invocations that actually
   push something, since this uses [git push
   options](https://docs.gitlab.com/ce/user/project/push_options.html).
 
