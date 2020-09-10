@@ -162,6 +162,10 @@ Only a brief description is shown here.
   $inferred_origin/HEAD`).  Since you can't fetch just unmerged PRs,
   normally you would do `fetchall` followed by `unfetchmerged`.
 
+* `git pr checkout $pr_number`: Locally check out a PR by number:
+  simply a `git pr fetch $pr_number` followed by `git checkout
+  pr/$pr_number`.
+
 * `git pr main` (also aliased to `master`) will checkout the inferred
   main base branch (your local branch, not the remote tracking
   branch).  If it can't infer it from the remote's upstream, tries the

@@ -444,6 +444,20 @@ EOF
 	git branch --remote --quiet -d $(git branch --remote --merged ${inferred_upstream}/HEAD | grep "$inferred_upstream/pr/[0-9]\+$")
 	;;
 
+    checkout)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr checkout PR_NUMBER
+
+Fetch PR refs to local, then check it out.  Equivalent to 'git pr
+fetch PR_NUMBER' followed by 'git checkout pr/PR_NUMBER'.
+EOF
+	    exit
+	fi
+	$0 fetch $1
+	git checkout pr/$1
+	;;
+
     master|main)
 	if test -n "$HELP" ; then
 	    cat <<EOF
