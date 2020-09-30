@@ -13,7 +13,7 @@ fi
 
 infer_remotes() {
     inferred_upstream="$(git remote | grep --max-count=1 ^upstream || git remote | grep --max-count=1 ^origin || git remote | head -1)"
-    inferred_origin="$(git remote | grep  --max-count=1 ^local || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
+    inferred_origin="$(git remote | grep  --max-count=1 ^local || git remote | grep  --max-count=1 ^fork || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
 #inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
 }
 
@@ -341,14 +341,14 @@ EOF
 	git --no-pager branch --merged ${inferred_upstream}/HEAD \
 	    | cut -c3- | cut -d' ' -f1 \
 	    | grep -E -v 'master|HEAD|gh-pages' \
-	    | xargs git branch --delete
+	    | xargs git branch --delete --
 	echo "remote"
 	git --no-pager branch --remote --merged ${inferred_upstream}/HEAD \
 	    | cut -c3- \
 	    | grep "^${inferred_origin}/" \
 	    | cut -d' ' -f1 \
 	    | grep -E -v 'master|HEAD|gh-pages' | cut -d/ -f2- \
-	    | xargs git push --delete ${inferred_origin}
+	    | xargs git push --delete ${inferred_origin} --
 	;;
 
     rm)
