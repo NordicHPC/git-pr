@@ -347,7 +347,7 @@ EOF
 	    | cut -c3- \
 	    | grep "^${inferred_origin}/" \
 	    | cut -d' ' -f1 \
-	    | grep -E -v 'master|HEAD|gh-pages' | cut -d/ -f2- \
+	    | grep -E -v 'main|master|HEAD|gh-pages' | cut -d/ -f2- \
 	    | xargs git push --delete ${inferred_origin} --
 	;;
 
