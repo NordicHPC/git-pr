@@ -340,7 +340,7 @@ EOF
 	echo "local"
 	git --no-pager branch --merged ${inferred_upstream}/HEAD \
 	    | cut -c3- | cut -d' ' -f1 \
-	    | grep -E -v 'master|HEAD|gh-pages' \
+	    | grep -E -v 'main|master|HEAD|gh-pages' \
 	    | xargs git branch --delete --
 	echo "remote"
 	git --no-pager branch --remote --merged ${inferred_upstream}/HEAD \
