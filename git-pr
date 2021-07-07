@@ -264,11 +264,12 @@ EOF
 	#
 
 	# 'branch' is the branch we push(ed) and is the head branch.
+	current_branch="$(git symbolic-ref HEAD | cut -d/ -f3-)"
 	if [ -n "$1" ] ; then
 	    branch="$1"
 	    shift
 	else
-	    branch=$(git symbolic-ref HEAD | cut -d/ -f3-)
+	    branch="$current_branch"
 	    if [ -z "$branch" ] ; then
 		echo "Not currently on a branch, must spetify branch name"
 		exit 1
@@ -286,9 +287,11 @@ EOF
 	# hub annoyingly requires you to be on a branch, even if it's
 	# not being used.  So we make a temporary branch and delete it
 	# after.
-	tmp_branch="git-pr-gh-tmp-branch-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
-	git checkout -B "$tmp_branch"  >> /dev/null  2>&1
-	trap 'git checkout @{-1} ;  git branch -D $tmp_branch' EXIT
+	if [ "$current_branch" != "$branch" ] ; then
+	    #tmp_branch="git-pr-gh-tmp-branch-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
+	    git checkout -B "$branch"  >> /dev/null  2>&1
+	    trap 'git checkout @{-1} ;  git branch -D $tmp_branch' EXIT
+	fi
 
 	echo "Trying to make a Github pull request..."
 	$GH pr create $PR_DRAFT $PR_NO_EDIT $PR_GITHUB_BASE --head="$head_owner:$branch" "$@"
@@ -296,7 +299,9 @@ EOF
 	# Reset HEAD back...
 	git checkout @{-1} >> /dev/null  2>&1
 	git branch -D "$tmp_branch" >> /dev/null  2>&1
-	trap EXIT  # untrap the cleanup command.
+	if [ "$current_branch" != "$branch" ] ; then
+	    trap EXIT  # untrap the cleanup command.
+	fi
 	;;
 
     merged)
