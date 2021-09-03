@@ -172,6 +172,12 @@ Only a brief description is shown here.
   order `main`, `master`, `gh-pages` and checks out the first that
   exists.
 
+* `git pr wrong-branch $brname`: You just committed to the wrong
+  branch.  This will 1) make a new feature branch at your current
+  commit 2) reset your current branch (presumed to be the default
+  branch) to upstream/HEAD 3) check out the new branch 4) not affect
+  uncommitted changes.  But user beware of special cases!
+
 * `git pr info` prints the autodetected remotes and base branches.
 
 * `git pr set-head` checks the remote and sets the remote default branch.
