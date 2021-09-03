@@ -13,7 +13,7 @@ fi
 
 infer_remotes() {
     inferred_upstream="$(git remote | grep --max-count=1 ^upstream || git remote | grep --max-count=1 ^origin || git remote | head -1)"
-    inferred_origin="$(git remote | grep  --max-count=1 ^local || git remote | grep  --max-count=1 ^fork || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
+    inferred_origin="$(git remote | grep  --max-count=1 ^$(git config --global --default=VALUENOTSET --get git-pr.originremote) || git remote | grep  --max-count=1 ^local || git remote | grep  --max-count=1 ^fork || git remote | grep --max-count=1 ^origin || git remote | grep  --max-count=1 ^upstream || git remote | head -1)"
 #inferred_head="$(git symbolic-ref refs/remotes/${inferred_upstream}/HEAD --short)"
 }
 
@@ -35,6 +35,19 @@ infer_remote_type() {
     fi
 }
 
+new_branch_name() (
+    # find a branch name for a new feature branch.  This may be the
+    # name requested ($1), or it may add a username prefix on front of
+    # it.
+    branch_prefix="$(git config --get git-pr.branchprefix)"
+    brname="$1"
+    # If branch name is given AND branch_prefix is given, use
+    # "branch_prefix/branch_name" as the actual branch name.
+    if [ -n "$brname" -a "$inferred_upstream" = "$inferred_origin" ] ; then
+	brname="${branch_prefix}${brname}"
+    fi
+    echo $brname
+    )
 
 print_help () {
     cat <<EOF
@@ -93,14 +106,8 @@ EOF
 	    esac
 	done
 	shift $((OPTIND-1))
-	#
-	branch_prefix="$(git config --get git-pr.branchprefix)"
-	brname="$1"
-	# If branch name is given AND branch_prefix is given, use
-	# "branch_prefix/branch_name" as the actual branch name.
-	if [ -n "$brname" -a "$inferred_upstream" = "$inferred_origin" ] ; then
-	    brname="${branch_prefix}${brname}"
-	fi
+	# Find new branchname, possibly with prefix
+	brname=$(new_branch_name "$1")
 	# Fetch current HEAD always
 	if [ "$NEW_ALWAYS_FETCH" ] ; then
 	    git fetch ${inferred_upstream} HEAD
@@ -458,6 +465,74 @@ EOF
 	git checkout pr/$1
 	;;
 
+
+    wrong-branch)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr wrong-branch new-branch-name
+
+Recover from commiting on the wrong branch.
+
+EOF
+	    exit
+	fi
+	infer_remotes
+	brname=$(new_branch_name "$1")
+	git branch $brname HEAD
+	git branch $brname --set-upstream-to=${inferred_upstream}/HEAD
+	git reset --mixed ${inferred_upstream}/HEAD
+	git checkout $brname --merge
+	;;
+
+
+    commit-if-not-default)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr commit-if-not-master
+
+If on the default branch, fail.  Otherwise, pass all other arguments
+through to "git commit".
+
+EOF
+	fi
+	# Fail if we are on the main branch.
+	if [ "$($0 default-branch-name)" = "$(git rev-parse --abbrev-ref HEAD)" ] ; then
+	    echo "You are on the default branch, denying commit."
+	    exit 1
+	fi
+	# Not on default branch, allowing commit
+	git commit "$@"
+	exit $?
+	;;
+
+
+    default-branch-name)
+	if test -n "$HELP" ; then
+	    cat <<EOF
+git pr default-branch-name
+
+Print the default branch name to stdout.  This first tries to use
+inferred_upstream/HEAD, and if not makes some guesses.
+
+EOF
+	    exit
+	fi
+	infer_remotes
+	brname=$(git symbolic-ref --short refs/remotes/${inferred_upstream}/HEAD | cut -d/ -f2-)
+	if test -n \"$brname\" ; then
+	    echo "$brname"
+	    return 0
+	fi
+	for brname in main master gh-pages; do
+	    if git branch --format='%(refname:short)' --list $brname \
+		    | grep $brname > /dev/null ; then
+		echo $brname
+		exit 0
+	    fi
+	done
+	;;
+
+
     master|main)
 	if test -n "$HELP" ; then
 	    cat <<EOF
@@ -466,22 +541,13 @@ git pr main
 Check out the inferred main branch (local copy, not the remote
 tracking branch).  Useful if you want to commit to your base branch
 without PRs.
+
 EOF
 	    exit
 	fi
-	infer_remotes
-	brname=$(git symbolic-ref --short refs/remotes/origin/HEAD | cut -d/ -f2-)
-	if test -n \"$brname\" ; then
-	    git checkout $brname ;
-	    [ $? = 0 ] && return 0
-	fi
-	for brname in main master gh-pages; do
-	    git branch --format='%(refname:short)' --list $brname \
-		| grep $brname > /dev/null \
-		&& git checkout $brname && exit 0
-	done
-
+	git checkout $($0 default-branch-name)
 	;;
+
 
     info)
 	if test -n "$HELP" ; then
