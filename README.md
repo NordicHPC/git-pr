@@ -35,9 +35,8 @@ There are no dependencies except POSIX shell (we hope - it's developed
 in `dash`).
 
 To automatically open Github pull requests, you must install the
-[hub](https://github.com/github/hub) command line tool (Recent
-Debian-based: `apt install hub`).  Gitlab pull requests require
-git>=2.10 and Gitlab>=11.10.
+[gh](https://cli.github.com/) command line tool.
+Gitlab pull requests require git>=2.10 and Gitlab>=11.10.
 
 
 
@@ -229,8 +228,9 @@ workflows, or you have ideas, please send pull requests.
 * Other projects of the same name
   * Fetches PRs using a PHP script: https://github.com/ozh/git-pr
   * May use Github CLI to make PRs: https://github.com/cladmi/git-pr/
-* [Github CLI](https://cli.github.com/) (new April 2020) might take
-  place of git-pr (but probably won't support Gitlab).
+* [Github CLI](https://cli.github.com/) (new April 2020) opens pull
+  requests (and is used by git-pr) but doesn't automate the rest of
+  the process around this. (and doesn't support Gitlab).
 
 
 ## License
