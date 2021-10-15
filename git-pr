@@ -291,22 +291,20 @@ EOF
 	head_owner="${head_info%%:*}"
 	head_repo="${head_info##*:}"
 
-	# hub annoyingly requires you to be on a branch, even if it's
-	# not being used.  So we make a temporary branch and delete it
-	# after.
+	# Handle the case where we are not on the branch we want to push
 	if [ "$current_branch" != "$branch" ] ; then
 	    #tmp_branch="git-pr-gh-tmp-branch-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)"
-	    git checkout -B "$branch"  >> /dev/null  2>&1
-	    trap 'git checkout @{-1} ;  git branch -D $tmp_branch' EXIT
+	    git branch "$branch"
+	    trap 'git branch -D $branch ; git checkout @{-1}' EXIT
 	fi
 
 	echo "Trying to make a Github pull request..."
 	$GH pr create $PR_DRAFT $PR_NO_EDIT $PR_GITHUB_BASE --head="$head_owner:$branch" "$@"
 
 	# Reset HEAD back...
-	git checkout @{-1} >> /dev/null  2>&1
-	git branch -D "$tmp_branch" >> /dev/null  2>&1
 	if [ "$current_branch" != "$branch" ] ; then
+	    git checkout @{-1}
+	    git branch -D "$branch"
 	    trap EXIT  # untrap the cleanup command.
 	fi
 	;;
