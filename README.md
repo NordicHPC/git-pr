@@ -2,18 +2,18 @@
 
 Everyone abstractly likes pull requests, but they can be a lot of keystrokes:
 making new branches, pushing them, and especially keeping track of
-what can be deleted.  This is an attempt to reduce the number of
-keystrokes to a bare minimum.:
+what can be deleted.  This is an attempt to automate the most common
+workflow, portable to Github/Gitlab, and work everywhere:
 
 * `git pr branch BRANCH_NAME` - make a new branch based on inferred
   upstream HEAD.
-* `git pr push -r` - push current branch to inferred origin,
-  automatically make Github pull request.
+* `git pr push -o` - push current branch to inferred upstream,
+  automatically open a pull/merge request.
 
 Features:
 
-* Create new PR branch: `git pr branch $name`
-* Push PR branch: `git pr push $name`
+* Create new PR branch: `git pr branch BR_NAME`
+* Push PR branch: `git pr push BR_NAME`
 * Automatically detect personal and upstream remotes names - when you
   need to start PRs, just add a remote if you need: best option based
   on names `local`, `upstream`, `origin` (see below).
@@ -23,7 +23,7 @@ Features:
 * Delete local and remote branches at same time: `git pr rm`
 * Support for Gitlab and Github
 * Support for automatically making PRs/MRs (Github and gitlab>11.10).
-* Single shell script
+* Single POSIX shell script
 
 
 ## Installation
@@ -44,17 +44,17 @@ Gitlab pull requests require git>=2.10 and Gitlab>=11.10.
 
 Here is our current short PR workflow (1):
 
-1. `git pr branch $brname`: create a new branch based on inferred
+1. `git pr branch BR_NAME`: create a new branch based on inferred
    `upstream/HEAD`.  (note: fetch first if you want to be sure to be
    up to date)
 
 2. Do work, commit, etc.
 
-3. `git pr push [-r]`: Infer upstream remote automatically and push to
-   branch matching local branch name.  The `-r` option automatically
+3. `git pr push [-o]`: Infer upstream remote automatically and push to
+   branch matching local branch name.  The `-o` option automatically
    opens a MR/PR (Gitlab/Github).
 
-5. Once you are done, `git pr rm $brname` to remove both local and
+5. Once you are done, `git pr rm BR_NAME` to remove both local and
    remote branches (again inferring upstream remote).
 
 There is actually an even shorter way (2):
@@ -64,8 +64,8 @@ There is actually an even shorter way (2):
 2. Do work, commit, etc.  If you change your mind, no need to remove
    anything.
 
-3. `git pr push [-r] $brname`: push to inferred upstream.  Note you need to
-   give a name since we don't have a local branch name.  The `[-r]`
+3. `git pr push [-o] BR_NAME`: push to inferred upstream.  Note you need to
+   give a name since we don't have a local branch name.  The `[-o]`
    option again creates a pull request.
 
 4. You don't need to remove anything - remove branch remotely (via
@@ -97,13 +97,14 @@ having to rename any remotes).
 For each command, you can run `-h` to get help (with no arguments).
 Only a brief description is shown here.
 
-* `git pr branch`: create a new PR based on the current
+* `git pr branch [BR_NAME]`: create a new PR based on the current
   `(inferred_upstream)/HEAD`.  See `-h` for some considerations.  Also
   at the top of the script is a configuration option to force a
   `fetch` before to make sure you are up to date.  With one argument,
-  create a branch of this name, otherwise create a detached head.
+  create a branch of this name, otherwise create a detached head.  The
+  new branch will track the upstream default branch.
 
-* `git pr push [-d] [-o] [[remote] branchname]`: Push a PR.  With no
+* `git pr push [-d] [-o] [[REMOTE] BR_NAME]`: Push a PR.  With no
   arguments, send to inferred
   origin automatically with a name the same as the current branch.
   With one argument, send to a branch of that name.  With two
@@ -119,7 +120,7 @@ Only a brief description is shown here.
   * `-n`: skip the "edit pull request message" step and instead use
     the message from the (first) commit. (Github)
   * `-d`: Will open as a draft pull request.  (Github)
-  * `-b {branch_name}`: Target the named branch as the base branch to
+  * `-b BR_NAME`: Target the named branch as the base branch to
     merge into (Github/Gitlab)
 
   Gitlab merge requests are only opened on invocations that actually
@@ -132,7 +133,7 @@ Only a brief description is shown here.
 * `git pr diff`: Diff between current working dir and merge-base of
   inferred_upstream.
 
-* `git pr rm $branch_name ...`: Remove named branches, both locally
+* `git pr rm BR_NAME ...`: Remove named branches, both locally
   and on inferred_origin.
 
 * `git pr merged`: show local and remote branches which can be
@@ -145,8 +146,8 @@ Only a brief description is shown here.
   upstream, and {local,remote} branches which are now merged to
   `$inferred_upstream/HEAD`.
 
-* `git pr fetch $pr_number`: Fetch the given upstream PR to a new
-  local remote branch `inferred_upstream/pr/$pr_number`. (all fetch
+* `git pr fetch PR_NUMBER`: Fetch the given upstream PR to a new
+  local remote branch `$inferred_upstream/pr/PR_NUMBER`. (all fetch
   commands support github.com and gitlab.com at least)
 
 * `git pr fetchall`: Fetch all remote upstream PRs to local
@@ -161,9 +162,9 @@ Only a brief description is shown here.
   $inferred_origin/HEAD`).  Since you can't fetch just unmerged PRs,
   normally you would do `fetchall` followed by `unfetchmerged`.
 
-* `git pr checkout $pr_number`: Locally check out a PR by number:
-  simply a `git pr fetch $pr_number` followed by `git checkout
-  pr/$pr_number`.
+* `git pr checkout PR_NUMBER`: Locally check out a PR by number:
+  simply a `git pr fetch PR_NUMBER` followed by `git checkout
+  pr/PR_NUMBER`.
 
 * `git pr main` (also aliased to `master`) will checkout the inferred
   main base branch (your local branch, not the remote tracking
@@ -171,7 +172,7 @@ Only a brief description is shown here.
   order `main`, `master`, `gh-pages` and checks out the first that
   exists.
 
-* `git pr wrong-branch $brname`: You just committed to the wrong
+* `git pr wrong-branch BR_NAME`: You just committed to the wrong
   branch.  This will 1) make a new feature branch at your current
   commit 2) reset your current branch (presumed to be the default
   branch) to upstream/HEAD 3) check out the new branch 4) not affect
@@ -184,13 +185,13 @@ Only a brief description is shown here.
 ## Configuration
 
 * **branch name prefix:** You may want to always prefix your branches
-  with your name, e.g. `rkdarst/auto-prefix`.  You can set the a git
+  with your name, e.g. `rkdarst/my-own-branch`.  You can set the a git
   variable using `git config --global git-pr.branchprefix PREFIX/`, and
   any branch you try to create will have this prefixed to it.  Note:
   include a trailing `/` or whatever character with your config
   option.  This is only applied if your `$inferred_upstream` is the
   same as your `$inferred_origin` (in other words, if you have a
-  separate personal repository, this won't be added).
+  separate forked repository, this won't be added).
 
 
 
@@ -200,8 +201,9 @@ We use the remote HEAD to infer what the upstream branch is.  There
 are some problems with this:
 
 - it is only set when first cloned, if default branch changes it won't
-  be updated later.  However, you can manually set this with `git
-  remote set-head ${inferred_upstream} $branch_name`
+  be updated later.  However, you can manually set this with `git pr
+  set-head` or `git remote set-head REMOTE
+  DEFAULT_BR_NAME` (or `git remote set-head REMOTE --auto`).
 
 - If multiple branches had the same HEAD as the default branch, the
   remote default branch can't be inferred automatically.
